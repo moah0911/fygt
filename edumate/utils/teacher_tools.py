@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import random
 from typing import List, Dict, Optional
 from .logger import log_system_event
-import speech_recognition as sr
 from gtts import gTTS
 import docx
 from fpdf import FPDF
