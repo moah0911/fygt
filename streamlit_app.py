@@ -1667,16 +1667,11 @@ By the end of this lesson, students will be able to:
                         updated_levels = []
                         
                         for j, level in enumerate(levels):
-                            col1, col2 = st.columns([1, 3])
-                            with col1:
-                                level_name = st.text_input(f"Level Name", value=level.get('name', ''), key=f"level_name_{i}_{j}")
-                            with col2:
-                                level_description = st.text_input(f"Description", value=level.get('description', ''), key=f"level_desc_{i}_{j}")
-                            
+                            level_name = st.text_input(f"Level {j+1} Name", value=level.get('name', ''), key=f"level_name_{i}_{j}")
+                            level_description = st.text_area(f"Level {j+1} Description", value=level.get('description', ''), key=f"level_desc_{i}_{j}")
                             updated_levels.append({
                                 'name': level_name,
-                                'description': level_description,
-                                'points': level.get('points', 0)
+                                'description': level_description
                             })
                         
                         updated_criteria.append({
@@ -1695,21 +1690,15 @@ By the end of this lesson, students will be able to:
                         # Create a DataFrame for the rubric
                         rubric_data = []
                         for criterion in updated_criteria:
-                            row = {'Criterion': criterion['name']}
                             for level in criterion['levels']:
-                                row[level['name']] = level['description']
-                            rubric_data.append(row)
+                                rubric_data.append({
+                                    'Criterion': criterion['name'],
+                                    'Level': level['name'],
+                                    'Description': level['description']
+                                })
                         
                         if rubric_data:
                             st.dataframe(pd.DataFrame(rubric_data))
-                            
-                            # Download option
-                            st.download_button(
-                                label="Download Rubric",
-                                data=f"# {selected_template} Rubric\n\n...",
-                                file_name=f"{selected_template.replace(' ', '_')}_rubric.txt",
-                                mime="text/plain"
-                            )
             else:
                 st.info("No rubric templates available.")
         
@@ -1809,13 +1798,12 @@ By the end of this lesson, students will be able to:
                         
                         # Display link if available
                         if resource.get('url'):
-                            st.markdown(f"**[Access Resource]({resource.get('url')})**")
+                            st.markdown(f"[Resource Link]({resource.get('url')})")
                         
                         # Display tags
                         if resource.get('tags'):
                             st.write("**Tags:**")
-                            tags_html = " ".join([f'<span style="background-color: #f0f0f0; padding: 2px 6px; border-radius: 10px; margin-right: 5px;">{tag}</span>' for tag in resource.get('tags')])
-                            st.markdown(tags_html, unsafe_allow_html=True)
+                            st.write(", ".join(resource.get('tags')))
             
             # Search resources
             st.write("### Search Resources")
@@ -1897,7 +1885,7 @@ By the end of this lesson, students will be able to:
                         
                         # Display link if available
                         if resource.get('url'):
-                            st.markdown(f"**[Access Resource]({resource.get('url')})**")
+                            st.markdown(f"[Resource Link]({resource.get('url')})")
                         
                         # Display provider
                         if resource.get('provider'):
@@ -3453,7 +3441,7 @@ def show_test_creator():
         if add_question:
             question_type = st.selectbox("Question Type", ["Multiple Choice", "True/False", "Short Answer", "Essay"])
             question_text = st.text_area("Question Text")
-            question_points = st.number_input("Points", min_value=1, max_value=100, value=10)
+            question_points = st.number_input("Points", min_value=1, max=100, value=10)
             
             # Different inputs based on question type
             if question_type == "Multiple Choice":
