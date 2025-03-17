@@ -1,0 +1,626 @@
+2025-03-13 20:13:05,453 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 20:23:43,587 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 20:25:31,200 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 21:24:48,113 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 21:25:48,224 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 21:26:55,361 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 21:49:56,914 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 21:50:02,593 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-13 22:34:51,633 [INFO] Error generating course analytics: 'score' - {C:\Users\gowth\OneDrive\Desktop\GDS\edumate\utils\logger.py:41}
+2025-03-14 11:03:35,169 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:07:44,858 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:07:44,858 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:12:51,957 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:18:39,793 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:22:02,644 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,848 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,848 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,848 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:37:25,848 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,092 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,092 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,092 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,092 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,092 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,233 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,233 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,233 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,233 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:38:18,233 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:11,925 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:11,925 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:11,925 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:11,925 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:11,925 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:14,404 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:14,404 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:15,887 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:15,887 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:15,887 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:15,887 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:15,887 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,087 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,087 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,087 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,087 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,087 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,229 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,229 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,229 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,229 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,229 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,669 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,669 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,669 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,669 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:20,669 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:22,433 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:22,433 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:25,750 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:25,750 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:25,906 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:41:25,906 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,792 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,792 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,792 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,792 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,792 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,792 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,940 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,940 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,940 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,940 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,940 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:53,940 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:55,892 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:55,892 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:45:55,892 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,619 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,620 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,620 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,620 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,620 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:46:48,765 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,713 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,714 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:47:46,864 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,115 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,115 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,115 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,115 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,115 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,115 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,116 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:48:21,265 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,164 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,165 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:49:23,311 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:05,914 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:50:14,097 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:00,798 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:01,247 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:04,933 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:05,294 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,332 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,334 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:52:18,698 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,354 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:54:23,509 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,143 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:55:48,149 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,275 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:56:36,279 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,958 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:57:11,977 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,552 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 11:59:21,553 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:00:09,690 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:31,267 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:02:43,536 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:03:07,846 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:06:49,112 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:06,145 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:08,430 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:09,282 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,396 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:13,585 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:07:45,824 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:10:52,771 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:26,417 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,638 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:34,878 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
