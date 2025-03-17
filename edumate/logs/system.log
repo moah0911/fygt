@@ -624,3 +624,15 @@
 2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
 2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
 2025-03-14 12:13:35,271 [INFO] Error generating career paths: 'CareerPlanner' object has no attribute 'get_career_recommendations' - {C:\Users\regul\Downloads\GSC-20250314T041820Z-001\GSC\edumate\utils\logger.py:41}
+2025-03-17 18:14:20,337 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:15:23,362 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:15:26,015 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:15:31,949 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:15:32,101 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:16:55,303 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:20:36,300 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:54:30,732 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:54:37,497 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:54:46,911 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 18:54:47,072 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-17 20:13:02,743 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}

@@ -1556,6 +1556,10 @@ By the end of this lesson, students will be able to:
         if assessment_type == "Quizzes":
             st.write("### Quiz Generator")
             
+            # Initialize quiz_data in session state if not exists
+            if 'quiz_data' not in st.session_state:
+                st.session_state.quiz_data = None
+            
             with st.form("quiz_generator"):
                 quiz_subject = st.text_input("Subject")
                 quiz_topic = st.text_input("Topic")
@@ -1580,48 +1584,50 @@ By the end of this lesson, students will be able to:
                     else:
                         with st.spinner("Generating quiz..."):
                             # Simulate AI processing
-                            import time
                             time.sleep(2)
                             
-                            # Display generated quiz
-                            st.success("Quiz generated successfully!")
+                            # Create quiz content
+                            quiz_content = f"# {quiz_topic} Quiz\n\nSubject: {quiz_subject}\nDifficulty: {quiz_level}\nTotal Questions: {quiz_questions}\n\n"
                             
-                            st.write(f"## {quiz_topic} Quiz")
-                            st.write(f"**Subject:** {quiz_subject}")
-                            st.write(f"**Difficulty:** {quiz_level}")
-                            st.write(f"**Total Questions:** {quiz_questions}")
-                            
-                            # Sample questions
-                            st.write("### Sample Questions")
-                            
+                            # Add sample questions based on types
                             if "Multiple Choice" in question_types:
-                                st.write("**Multiple Choice**")
-                                st.write("1. What is the main concept of this topic?")
-                                st.write("   a) Option A")
-                                st.write("   b) Option B")
-                                st.write("   c) Option C")
-                                st.write("   d) Option D")
+                                quiz_content += "**Multiple Choice**\n\n"
+                                quiz_content += "1. What is the main concept of this topic?\n"
+                                quiz_content += "   a) Option A\n   b) Option B\n   c) Option C\n   d) Option D\n\n"
                             
                             if "True/False" in question_types:
-                                st.write("**True/False**")
-                                st.write("2. This statement about the topic is correct.")
-                                st.write("   True / False")
+                                quiz_content += "**True/False**\n\n"
+                                quiz_content += "2. This statement about the topic is correct.\n"
+                                quiz_content += "   True / False\n\n"
                             
                             if "Short Answer" in question_types:
-                                st.write("**Short Answer**")
-                                st.write("3. Explain the relationship between concept A and concept B.")
+                                quiz_content += "**Short Answer**\n\n"
+                                quiz_content += "3. Explain the relationship between concept A and concept B.\n\n"
                             
                             if "Fill in the Blank" in question_types:
-                                st.write("**Fill in the Blank**")
-                                st.write("4. The process of ________ is essential to understanding this topic.")
+                                quiz_content += "**Fill in the Blank**\n\n"
+                                quiz_content += "4. The process of ________ is essential to understanding this topic.\n"
                             
-                            # Download option
-                            st.download_button(
-                                label="Download Quiz",
-                                data=f"# {quiz_topic} Quiz\n\nSubject: {quiz_subject}\nDifficulty: {quiz_level}\nTotal Questions: {quiz_questions}\n\n...",
-                                file_name=f"{quiz_subject}_{quiz_topic}_quiz.txt",
-                                mime="text/plain"
-                            )
+                            # Store quiz content in session state
+                            st.session_state.quiz_data = {
+                                'content': quiz_content,
+                                'filename': f"{quiz_subject}_{quiz_topic}_quiz.txt"
+                            }
+                            
+                            st.success("Quiz generated successfully!")
+            
+            # Display quiz preview and download button outside the form
+            if st.session_state.quiz_data:
+                st.write("### Quiz Preview")
+                st.markdown(st.session_state.quiz_data['content'])
+                
+                # Download button outside the form
+                st.download_button(
+                    label="Download Quiz",
+                    data=st.session_state.quiz_data['content'],
+                    file_name=st.session_state.quiz_data['filename'],
+                    mime="text/plain"
+                )
         
         elif assessment_type == "Rubrics":
             st.write("### Rubric Creator")
@@ -3025,11 +3031,6 @@ def show_assignment_submissions():
                 # Display AI suggestions if available
                 if submission.get('ai_suggestions'):
                     show_ai_suggestions(submission['ai_suggestions'])
-    
-    # Back button
-    if st.button("Back to Course", key="back_to_course_btn"):
-        st.session_state.current_page = 'course_detail'
-        st.rerun()
 
 def show_ai_suggestions(suggestions):
     """Display AI-generated suggestions"""
