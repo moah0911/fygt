@@ -1,0 +1,25 @@
+Metadata-Version: 2.2
+Name: edumate
+Version: 0.1.0
+Requires-Dist: Flask==2.3.3
+Requires-Dist: Flask-SQLAlchemy==3.1.1
+Requires-Dist: Flask-Migrate==4.0.5
+Requires-Dist: Flask-JWT-Extended==4.5.3
+Requires-Dist: Flask-Cors==4.0.0
+Requires-Dist: Flask-RESTful==0.3.10
+Requires-Dist: SQLAlchemy==2.0.27
+Requires-Dist: typing_extensions>=4.9.0
+Requires-Dist: waitress==2.1.2
+Requires-Dist: python-dotenv==1.0.0
+Requires-Dist: Werkzeug==2.3.7
+Requires-Dist: python-docx==1.0.1
+Requires-Dist: PyPDF2==3.0.1
+Requires-Dist: nltk==3.8.1
+Requires-Dist: scikit-learn==1.4.1.post1
+Requires-Dist: numpy==1.26.4
+Requires-Dist: pandas==2.2.1
+Provides-Extra: ai
+Requires-Dist: google-generativeai==0.3.1; extra == "ai"
+Requires-Dist: openai==1.3.5; extra == "ai"
+Dynamic: provides-extra
+Dynamic: requires-dist
