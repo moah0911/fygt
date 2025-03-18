@@ -2732,7 +2732,7 @@ def show_career_planning():
             
             for i, phase in enumerate(timeline_data):
                 col1, col2 = st.columns([1, 4])
-                        with col1:
+                with col1:
                     st.markdown(f"### {i+1}.")
                 with col2:
                     st.markdown(f"**{phase['phase']}**")
