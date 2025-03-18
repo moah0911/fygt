@@ -321,7 +321,7 @@ class TeacherAssistant:
             return f"Great improvement! Your score of {current_score:.1f} is above your average of {avg_score:.1f}."
         elif current_score < avg_score - 5:
             return f"Your score of {current_score:.1f} is below your average of {avg_score:.1f}. Keep working on the suggestions provided."
-        else:
+            else:
             return f"You're maintaining consistent performance around {avg_score:.1f}. Focus on the suggestions to improve further."
     
     def _analyze_class_performance(self, results: List[Dict]) -> Dict:

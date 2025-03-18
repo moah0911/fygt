@@ -1,9 +1,9 @@
-"""Advanced plagiarism detection service."""
+"""Advanced plagiarism detection service for student submissions."""
 import logging
 import re
 import os
 import hashlib
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Union
 import requests
 from pathlib import Path
 import json
@@ -19,403 +19,609 @@ logger = logging.getLogger(__name__)
 class PlagiarismService:
     """Service for detecting plagiarism in student submissions."""
     
-    def __init__(self):
-        """Initialize the plagiarism detection service."""
-        # Set up cache directory for previously analyzed content
-        self.cache_dir = Path("data/cache/plagiarism")
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Load external API keys if available
-        self.api_key = os.environ.get("PLAGIARISM_API_KEY")
-        
-        # Initialize vectorizer for text comparison
-        self.vectorizer = TfidfVectorizer(
-            stop_words='english',
-            ngram_range=(1, 3),
-            min_df=2,
-            lowercase=True
-        )
-        
-        # Load reference database if available
-        self.reference_db = self._load_reference_db()
-    
-    def check_plagiarism(self, content: str, compare_against: Optional[List[str]] = None) -> Dict[str, Any]:
-        """Check content for plagiarism against various sources.
+    def __init__(self, reference_db_path: str = None, cache_dir: str = None, api_key: str = None):
+        """Initialize the plagiarism detection service.
         
         Args:
-            content: The content to check for plagiarism
-            compare_against: Additional content to compare against (optional)
+            reference_db_path: Path to reference database for comparison
+            cache_dir: Directory to store cache
+            api_key: External API key for additional plagiarism detection
+        """
+        # Set up paths
+        self.reference_db_path = reference_db_path or "data/reference_db.json"
+        self.cache_dir = Path(cache_dir or "data/cache/plagiarism")
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        Path(os.path.dirname(self.reference_db_path)).mkdir(parents=True, exist_ok=True)
+        
+        # Load reference database
+        self.reference_db = self._load_reference_db()
+        
+        # Set up API key for external service
+        self.api_key = api_key or os.getenv('PLAGIARISM_API_KEY')
+        
+        # Initialize vectorizer for text comparison
+        self.vectorizer = TfidfVectorizer(stop_words='english')
+        
+        logger.info("Plagiarism service initialized")
+    
+    def check_plagiarism(self, content: str, comparison_content: Optional[List[str]] = None, 
+                        threshold: float = 0.8, check_external: bool = True) -> Dict[str, Any]:
+        """Check content for plagiarism against references and optionally external sources.
+        
+        Args:
+            content: Text content to check for plagiarism
+            comparison_content: Optional specific content to compare against
+            threshold: Similarity threshold for plagiarism detection (0.0 to 1.0)
+            check_external: Whether to check against external API
             
         Returns:
             Dictionary with plagiarism score and analysis
         """
-        if not content:
-            return {"score": 0, "matches": [], "error": "Empty content"}
+        # Validate and clean input
+        if not content or not content.strip():
+            return {
+                "score": 0.0,
+                "matches": [],
+                "original": True,
+                "message": "Empty content provided"
+            }
             
         # Preprocess content
         processed_content = self._preprocess_text(content)
-        content_hash = self._get_content_hash(processed_content)
+        content_hash = hashlib.md5(processed_content.encode('utf-8')).hexdigest()
         
         # Check cache first
-        cached_result = self._check_cache(content_hash)
-        if cached_result:
-            logger.info("Using cached plagiarism result")
-            return cached_result
+        cache_result = self._check_cache(content_hash)
+        if cache_result:
+            logger.info("Returning cached plagiarism result")
+            return cache_result
         
-        # Local corpus comparison
-        local_similarity = self._check_against_local_corpus(processed_content, compare_against)
+        # Initialize results
+        results = {
+            "score": 0.0,
+            "matches": [],
+            "original": True,
+            "message": "Content appears to be original"
+        }
         
-        # Reference database comparison
-        reference_similarity = self._check_against_reference_db(processed_content)
+        # Perform three types of checks and combine results
+        local_result = self._check_local_corpus(processed_content, threshold)
+        reference_result = self._check_reference_db(processed_content, threshold)
         
-        # External API check (if available)
-        api_similarity = self._check_external_api(processed_content) if self.api_key else {"score": 0, "sources": []}
+        # Combine local and reference results
+        if local_result["score"] > 0 or reference_result["score"] > 0:
+            max_score = max(local_result["score"], reference_result["score"])
+            combined_matches = local_result["matches"] + reference_result["matches"]
+            
+            # Sort matches by similarity score (descending)
+            combined_matches.sort(key=lambda x: x["similarity"], reverse=True)
+            
+            results["score"] = max_score
+            results["matches"] = combined_matches
+            results["original"] = max_score < threshold
+            
+            if max_score >= threshold:
+                results["message"] = f"Potential plagiarism detected ({max_score:.2f} similarity)"
         
-        # Combine all results
-        result = self._combine_results(local_similarity, reference_similarity, api_similarity)
+        # Check against specific comparison content if provided
+        if comparison_content:
+            comparison_result = self._compare_with_content(processed_content, comparison_content, threshold)
+            
+            if comparison_result["score"] > results["score"]:
+                results["score"] = comparison_result["score"]
+                results["matches"] = comparison_result["matches"] + results["matches"]
+                results["original"] = comparison_result["score"] < threshold
+                
+                if comparison_result["score"] >= threshold:
+                    results["message"] = f"Potential plagiarism detected in direct comparison ({comparison_result['score']:.2f} similarity)"
         
-        # Cache result
-        self._cache_result(content_hash, result)
+        # Check against external API if enabled
+        if check_external and self.api_key:
+            try:
+                api_result = self._check_external_api(content)
+                
+                # If API check found higher plagiarism, update results
+                if api_result["score"] > results["score"]:
+                    results["score"] = api_result["score"]
+                    results["matches"] = api_result["matches"] + results["matches"]
+                    results["original"] = api_result["score"] < threshold
+                    results["message"] = api_result["message"]
+                    
+            except Exception as e:
+                logger.error(f"Error checking external API: {e}")
+                # Continue with local results if API fails
         
-        return result
+        # Add summary information
+        results["summary"] = self._generate_summary(results)
+        
+        # Cache results
+        self._cache_result(content_hash, results)
+        
+        return results
     
-    def add_to_reference_db(self, content: str, metadata: Dict[str, str]) -> bool:
+    def add_to_reference_db(self, content: str, metadata: Dict[str, Any]) -> bool:
         """Add content to the reference database.
         
         Args:
-            content: The content to add
+            content: Content to add to reference database
             metadata: Information about the content (author, title, etc.)
             
         Returns:
-            True if successfully added
+            Boolean indicating success
         """
-        if not content:
+        if not content or not content.strip():
             return False
             
-        # Preprocess content
+        # Process content
         processed_content = self._preprocess_text(content)
-        content_hash = self._get_content_hash(processed_content)
+        content_hash = hashlib.md5(processed_content.encode('utf-8')).hexdigest()
         
-        # Add to reference database
-        if not hasattr(self, 'reference_db'):
-            self.reference_db = {'entries': []}
-            
         # Check if already exists
-        if any(entry.get('hash') == content_hash for entry in self.reference_db.get('entries', [])):
-            logger.info(f"Content with hash {content_hash} already exists in reference database")
+        if content_hash in self.reference_db:
+            logger.info(f"Content already exists in reference DB with hash {content_hash}")
             return False
-        
-        # Add new entry
-        entry = {
-            'hash': content_hash,
-            'content': processed_content,
-            'metadata': metadata,
-            'timestamp': time.time()
+            
+        # Add to database
+        self.reference_db[content_hash] = {
+            "content": processed_content,
+            "metadata": metadata,
+            "added_at": time.time()
         }
-        
-        self.reference_db.setdefault('entries', []).append(entry)
         
         # Save database
         self._save_reference_db()
+        logger.info(f"Added content to reference DB with hash {content_hash}")
         
         return True
     
+    def _check_local_corpus(self, content: str, threshold: float) -> Dict[str, Any]:
+        """Compare content against local corpus using TF-IDF and cosine similarity.
+        
+        Args:
+            content: Preprocessed content to check
+            threshold: Similarity threshold
+            
+        Returns:
+            Dictionary with score and matches
+        """
+        result = {
+            "score": 0.0,
+            "matches": []
+        }
+        
+        # If reference database is empty, return empty result
+        if not self.reference_db:
+            return result
+            
+        try:
+            # Create corpus with content to check and reference texts
+            corpus = [content]
+            reference_hashes = []
+            
+            for doc_hash, doc_data in self.reference_db.items():
+                corpus.append(doc_data["content"])
+                reference_hashes.append(doc_hash)
+            
+            # Skip if only the input content exists
+            if len(corpus) <= 1:
+                return result
+                
+            # Calculate TF-IDF and similarity
+            tfidf_matrix = self.vectorizer.fit_transform(corpus)
+            cosine_similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
+            
+            # Find matches above threshold
+            max_similarity = 0.0
+            for i, similarity in enumerate(cosine_similarities):
+                if similarity >= threshold:
+                    doc_hash = reference_hashes[i]
+                    doc_data = self.reference_db[doc_hash]
+                    
+                    match = {
+                        "similarity": float(similarity),
+                        "source": doc_data["metadata"].get("title", "Unknown Source"),
+                        "author": doc_data["metadata"].get("author", "Unknown Author"),
+                        "type": "reference_db",
+                        "source_id": doc_hash
+                    }
+                    
+                    result["matches"].append(match)
+                
+                max_similarity = max(max_similarity, similarity)
+            
+            result["score"] = float(max_similarity)
+            
+        except Exception as e:
+            logger.error(f"Error in local corpus check: {e}")
+            
+        return result
+    
+    def _check_reference_db(self, content: str, threshold: float) -> Dict[str, Any]:
+        """Check content against reference database for direct matches.
+        
+        Args:
+            content: Preprocessed content to check
+            threshold: Similarity threshold
+            
+        Returns:
+            Dictionary with score and matches
+        """
+        result = {
+            "score": 0.0,
+            "matches": []
+        }
+        
+        # Extract sentences from content to check
+        content_sentences = self._extract_sentences(content)
+        
+        # Process each reference document
+        max_similarity = 0.0
+        
+        for doc_hash, doc_data in self.reference_db.items():
+            ref_content = doc_data["content"]
+            ref_sentences = self._extract_sentences(ref_content)
+            
+            # Skip empty documents
+            if not ref_sentences:
+                continue
+                
+            # Compare sentences for matches
+            matches = self._find_matching_segments(content_sentences, ref_sentences)
+            
+            if matches:
+                similarity = matches[0]["similarity"]  # Highest similarity match
+                
+                if similarity >= threshold:
+                    match = {
+                        "similarity": similarity,
+                        "source": doc_data["metadata"].get("title", "Unknown Source"),
+                        "author": doc_data["metadata"].get("author", "Unknown Author"),
+                        "type": "exact_match",
+                        "source_id": doc_hash,
+                        "matched_text": matches[0]["text"]
+                    }
+                    
+                    result["matches"].append(match)
+                
+                max_similarity = max(max_similarity, similarity)
+        
+        result["score"] = max_similarity
+        return result
+    
+    def _check_external_api(self, content: str) -> Dict[str, Any]:
+        """Check content for plagiarism using external API.
+        
+        Args:
+            content: Original content to check
+            
+        Returns:
+            Dictionary with score and matches from external API
+        """
+        result = {
+            "score": 0.0,
+            "matches": [],
+            "message": "No external plagiarism detected"
+        }
+        
+        if not self.api_key:
+            return result
+            
+        try:
+            # Sample API call - replace with actual API integration
+            # This is a placeholder - implement with your chosen plagiarism API
+            api_url = "https://api.plagiarismchecker.example/v1/check"
+            
+            payload = {
+                "text": content[:10000],  # API may have text size limits
+                "api_key": self.api_key
+            }
+            
+            # Uncomment to use a real API
+            # response = requests.post(api_url, json=payload)
+            # api_result = response.json()
+            
+            # Placeholder API result for testing
+            api_result = {
+                "plagiarism_score": 0.0,
+                "matches": []
+            }
+            
+            # Process API response
+            api_score = float(api_result.get("plagiarism_score", 0.0))
+            
+            # Transform API matches to our format
+            for api_match in api_result.get("matches", []):
+                match = {
+                    "similarity": float(api_match.get("similarity", 0.0)),
+                    "source": api_match.get("source_url", "External Source"),
+                    "matched_text": api_match.get("matched_text", ""),
+                    "type": "external_api"
+                }
+                
+                result["matches"].append(match)
+            
+            result["score"] = api_score
+            
+            if api_score > 0.5:  # Use appropriate threshold
+                result["message"] = f"External plagiarism check found {api_score:.2f} similarity score"
+                
+        except Exception as e:
+            logger.error(f"Error with external API: {e}")
+            
+        return result
+    
+    def _compare_with_content(self, content: str, comparison_texts: List[str], 
+                             threshold: float) -> Dict[str, Any]:
+        """Compare content directly against provided comparison texts.
+        
+        Args:
+            content: Preprocessed content to check
+            comparison_texts: List of texts to compare against
+            threshold: Similarity threshold
+            
+        Returns:
+            Dictionary with score and matches
+        """
+        result = {
+            "score": 0.0,
+            "matches": []
+        }
+        
+        if not comparison_texts:
+            return result
+            
+        try:
+            # Create corpus with content and comparison texts
+            corpus = [content] + [self._preprocess_text(text) for text in comparison_texts]
+            
+            # Calculate TF-IDF and similarity
+            tfidf_matrix = self.vectorizer.fit_transform(corpus)
+            cosine_similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
+            
+            # Process similarities
+            max_similarity = 0.0
+            
+            for i, similarity in enumerate(cosine_similarities):
+                if similarity >= threshold:
+                    match = {
+                        "similarity": float(similarity),
+                        "source": f"Provided comparison text #{i+1}",
+                        "type": "direct_comparison"
+                    }
+                    
+                    result["matches"].append(match)
+                
+                max_similarity = max(max_similarity, similarity)
+            
+            result["score"] = float(max_similarity)
+            
+        except Exception as e:
+            logger.error(f"Error in direct comparison: {e}")
+        
+        return result
+    
+    def _find_matching_segments(self, content_sentences: List[str], 
+                               ref_sentences: List[str]) -> List[Dict[str, Any]]:
+        """Find matching text segments between content and reference.
+        
+        Args:
+            content_sentences: List of sentences from content
+            ref_sentences: List of sentences from reference
+            
+        Returns:
+            List of matching segments with similarity scores
+        """
+        matches = []
+        
+        # Skip if either list is empty
+        if not content_sentences or not ref_sentences:
+            return matches
+            
+        # Compare each content sentence against reference sentences
+        for i, content_sent in enumerate(content_sentences):
+            content_sent = content_sent.strip()
+            
+            # Skip short sentences (likely common phrases)
+            if len(content_sent.split()) < 7:
+                continue
+                
+            # Compare against each reference sentence
+            for j, ref_sent in enumerate(ref_sentences):
+                ref_sent = ref_sent.strip()
+                
+                # Calculate similarity
+                similarity = self._calculate_similarity(content_sent, ref_sent)
+                
+                if similarity > 0.8:  # Threshold for sentence matching
+                    matches.append({
+                        "text": content_sent,
+                        "ref_text": ref_sent,
+                        "content_idx": i,
+                        "ref_idx": j,
+                        "similarity": similarity
+                    })
+        
+        # Sort matches by similarity (descending)
+        matches.sort(key=lambda x: x["similarity"], reverse=True)
+        
+        return matches
+    
+    def _calculate_similarity(self, text1: str, text2: str) -> float:
+        """Calculate similarity between two text segments.
+        
+        Args:
+            text1: First text segment
+            text2: Second text segment
+            
+        Returns:
+            Similarity score between 0.0 and 1.0
+        """
+        # For short texts, check for exact match or containment
+        if text1 == text2:
+            return 1.0
+            
+        if text1 in text2 or text2 in text1:
+            return 0.9
+            
+        # For longer texts, use cosine similarity
+        try:
+            # Create temporary corpus with both texts
+            corpus = [text1, text2]
+            
+            # Calculate TF-IDF and similarity
+            temp_vectorizer = TfidfVectorizer(stop_words='english')
+            tfidf_matrix = temp_vectorizer.fit_transform(corpus)
+            similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()[0]
+            
+            return float(similarity)
+            
+        except Exception as e:
+            logger.warning(f"Error calculating similarity: {e}")
+            
+            # Fallback: simple word overlap ratio
+            words1 = set(text1.lower().split())
+            words2 = set(text2.lower().split())
+            
+            if not words1 or not words2:
+                return 0.0
+                
+            overlap = len(words1.intersection(words2))
+            union = len(words1.union(words2))
+            
+            return overlap / union if union > 0 else 0.0
+    
     def _preprocess_text(self, text: str) -> str:
-        """Prepare text for plagiarism detection."""
-        # Remove extra whitespace
-        text = re.sub(r'\s+', ' ', text)
+        """Preprocess text for consistent comparison.
         
-        # Remove special characters
-        text = re.sub(r'[^\w\s]', '', text)
-        
+        Args:
+            text: Raw text
+            
+        Returns:
+            Preprocessed text
+        """
+        if not text:
+            return ""
+            
         # Convert to lowercase
         text = text.lower()
         
-        return text.strip()
+        # Remove extra whitespace
+        text = re.sub(r'\s+', ' ', text).strip()
+        
+        # Remove special characters and numbers (optional)
+        # text = re.sub(r'[^\w\s]', '', text)
+        # text = re.sub(r'\d+', '', text)
+        
+        return text
     
-    def _get_content_hash(self, content: str) -> str:
-        """Generate a hash for the content."""
-        return hashlib.md5(content.encode('utf-8')).hexdigest()
+    def _extract_sentences(self, text: str) -> List[str]:
+        """Extract sentences from text.
+        
+        Args:
+            text: Text to extract sentences from
+            
+        Returns:
+            List of sentences
+        """
+        # Split text into sentences
+        sentences = re.split(r'(?<=[.!?])\s+', text)
+        
+        # Filter out empty or very short sentences
+        return [s.strip() for s in sentences if len(s.strip()) > 10]
+    
+    def _generate_summary(self, results: Dict[str, Any]) -> str:
+        """Generate a human-readable summary of plagiarism results.
+        
+        Args:
+            results: Plagiarism check results
+            
+        Returns:
+            Human-readable summary
+        """
+        score = results["score"]
+        matches = results["matches"]
+        
+        if score < 0.3:
+            return "The content appears to be original with no significant matches found."
+            
+        elif score < 0.5:
+            return f"The content contains some similarity ({score:.2f}) with existing sources, but is likely original work with proper citation."
+            
+        elif score < 0.7:
+            match_count = len(matches)
+            sources = ", ".join(set(m["source"] for m in matches[:3]))
+            return f"Moderate similarity ({score:.2f}) detected with {match_count} potential matches from sources including {sources}. Review suggested."
+            
+        else:
+            match_count = len(matches)
+            sources = ", ".join(set(m["source"] for m in matches[:3]))
+            return f"High similarity ({score:.2f}) detected with {match_count} significant matches from sources including {sources}. Detailed review required."
+    
+    def _load_reference_db(self) -> Dict[str, Any]:
+        """Load reference database from file.
+        
+        Returns:
+            Dictionary containing reference documents
+        """
+        try:
+            if os.path.exists(self.reference_db_path):
+                with open(self.reference_db_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            else:
+                logger.info(f"Reference database not found at {self.reference_db_path}, creating new database")
+                return {}
+        except Exception as e:
+            logger.error(f"Error loading reference database: {e}")
+            return {}
+    
+    def _save_reference_db(self) -> bool:
+        """Save reference database to file.
+        
+        Returns:
+            Boolean indicating success
+        """
+        try:
+            with open(self.reference_db_path, 'w', encoding='utf-8') as f:
+                json.dump(self.reference_db, f, indent=2)
+            return True
+        except Exception as e:
+            logger.error(f"Error saving reference database: {e}")
+            return False
     
     def _check_cache(self, content_hash: str) -> Optional[Dict[str, Any]]:
-        """Check if plagiarism result exists in cache."""
+        """Check if result exists in cache.
+        
+        Args:
+            content_hash: Hash of content
+            
+        Returns:
+            Cached result or None
+        """
         cache_file = self.cache_dir / f"{content_hash}.json"
+        
         if cache_file.exists():
             try:
-                with open(cache_file, 'r') as f:
+                with open(cache_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except Exception as e:
                 logger.warning(f"Failed to read cache: {str(e)}")
+                
         return None
     
     def _cache_result(self, content_hash: str, result: Dict[str, Any]) -> None:
-        """Cache plagiarism result."""
+        """Cache a plagiarism check result.
+        
+        Args:
+            content_hash: Hash of content
+            result: Result to cache
+        """
         cache_file = self.cache_dir / f"{content_hash}.json"
+        
         try:
-            with open(cache_file, 'w') as f:
+            with open(cache_file, 'w', encoding='utf-8') as f:
                 json.dump(result, f, indent=2)
         except Exception as e:
             logger.warning(f"Failed to cache result: {str(e)}")
-    
-    def _check_against_local_corpus(self, content: str, 
-                                   compare_against: Optional[List[str]] = None) -> Dict[str, Any]:
-        """Compare content against provided corpus.
-        
-        Args:
-            content: The content to check
-            compare_against: List of other content to compare against
-            
-        Returns:
-            Dictionary with similarity score and matches
-        """
-        if not compare_against:
-            return {"score": 0, "matches": []}
-            
-        # Preprocess comparison corpus
-        processed_corpus = [self._preprocess_text(text) for text in compare_against]
-        
-        # Calculate similarity using TF-IDF and cosine similarity
-        try:
-            # Add the content to check at the beginning
-            all_texts = [content] + processed_corpus
-            
-            # If only one document, similarity is 0
-            if len(all_texts) < 2:
-                return {"score": 0, "matches": []}
-                
-            # Create TF-IDF matrix
-            tfidf_matrix = self.vectorizer.fit_transform(all_texts)
-            
-            # Calculate cosine similarity between first document and all others
-            similarity_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
-            
-            # Find matches above threshold
-            matches = []
-            max_score = 0
-            for i, score in enumerate(similarity_scores):
-                if score > 0.3:  # Similarity threshold
-                    max_score = max(max_score, score)
-                    matches.append({
-                        "document_index": i,
-                        "similarity": float(score),
-                        "excerpt": self._extract_similar_excerpt(content, processed_corpus[i])
-                    })
-            
-            return {
-                "score": float(max_score),
-                "matches": sorted(matches, key=lambda x: x["similarity"], reverse=True)
-            }
-            
-        except Exception as e:
-            logger.error(f"Error during local corpus comparison: {str(e)}")
-            return {"score": 0, "matches": [], "error": str(e)}
-    
-    def _check_against_reference_db(self, content: str) -> Dict[str, Any]:
-        """Compare content against reference database."""
-        if not hasattr(self, 'reference_db') or not self.reference_db.get('entries'):
-            return {"score": 0, "matches": []}
-            
-        try:
-            # Extract content from reference database
-            reference_texts = [entry.get('content', '') for entry in self.reference_db.get('entries', [])]
-            
-            # If database is empty, return no matches
-            if not reference_texts:
-                return {"score": 0, "matches": []}
-                
-            # Create TF-IDF matrix
-            all_texts = [content] + reference_texts
-            tfidf_matrix = self.vectorizer.fit_transform(all_texts)
-            
-            # Calculate cosine similarity
-            similarity_scores = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:]).flatten()
-            
-            # Find matches above threshold
-            matches = []
-            max_score = 0
-            for i, score in enumerate(similarity_scores):
-                if score > 0.3:  # Similarity threshold
-                    max_score = max(max_score, score)
-                    reference_entry = self.reference_db.get('entries', [])[i]
-                    matches.append({
-                        "reference_id": i,
-                        "similarity": float(score),
-                        "metadata": reference_entry.get('metadata', {}),
-                        "excerpt": self._extract_similar_excerpt(content, reference_entry.get('content', ''))
-                    })
-            
-            return {
-                "score": float(max_score),
-                "matches": sorted(matches, key=lambda x: x["similarity"], reverse=True)
-            }
-            
-        except Exception as e:
-            logger.error(f"Error during reference database comparison: {str(e)}")
-            return {"score": 0, "matches": [], "error": str(e)}
-    
-    def _check_external_api(self, content: str) -> Dict[str, Any]:
-        """Check plagiarism using external API (if available)."""
-        if not self.api_key:
-            return {"score": 0, "sources": []}
-            
-        try:
-            # This is a placeholder for external API integration
-            # In a real implementation, this would call an external service
-            # For now, return mock result
-            return {
-                "score": 0.1,
-                "sources": [{
-                    "url": "https://example.com/sample",
-                    "similarity": 0.1,
-                    "title": "Sample Source"
-                }]
-            }
-            
-        except Exception as e:
-            logger.error(f"Error during external API check: {str(e)}")
-            return {"score": 0, "sources": [], "error": str(e)}
-    
-    def _combine_results(self, local_result: Dict[str, Any], 
-                        reference_result: Dict[str, Any],
-                        api_result: Dict[str, Any]) -> Dict[str, Any]:
-        """Combine results from different plagiarism checks."""
-        # Get highest similarity score from any source
-        max_score = max(
-            local_result.get('score', 0),
-            reference_result.get('score', 0),
-            api_result.get('score', 0)
-        )
-        
-        # Combine matches
-        all_matches = []
-        
-        # Add local matches
-        for match in local_result.get('matches', []):
-            all_matches.append({
-                "source": "local_corpus",
-                "similarity": match.get('similarity', 0),
-                "excerpt": match.get('excerpt', ''),
-                "document_index": match.get('document_index')
-            })
-            
-        # Add reference matches
-        for match in reference_result.get('matches', []):
-            all_matches.append({
-                "source": "reference_database",
-                "similarity": match.get('similarity', 0),
-                "excerpt": match.get('excerpt', ''),
-                "metadata": match.get('metadata', {})
-            })
-            
-        # Add API matches
-        for source in api_result.get('sources', []):
-            all_matches.append({
-                "source": "external_api",
-                "similarity": source.get('similarity', 0),
-                "url": source.get('url', ''),
-                "title": source.get('title', '')
-            })
-            
-        # Sort matches by similarity
-        all_matches.sort(key=lambda x: x.get('similarity', 0), reverse=True)
-        
-        # Generate human-readable summary
-        summary = self._generate_summary(max_score, all_matches)
-        
-        return {
-            "score": max_score,
-            "matches": all_matches[:10],  # Limit to top 10 matches
-            "match_count": len(all_matches),
-            "summary": summary,
-            "severity": self._get_severity_level(max_score)
-        }
-    
-    def _extract_similar_excerpt(self, text1: str, text2: str) -> str:
-        """Extract similar excerpt between two texts."""
-        # Split into sentences
-        sentences1 = re.split(r'(?<=[.!?])\s+', text1)
-        sentences2 = re.split(r'(?<=[.!?])\s+', text2)
-        
-        # Compare each sentence
-        best_match = ""
-        best_score = 0
-        
-        for s1 in sentences1:
-            if len(s1) < 20:  # Skip very short sentences
-                continue
-                
-            for s2 in sentences2:
-                if len(s2) < 20:
-                    continue
-                    
-                # Calculate similarity
-                similarity = self._sentence_similarity(s1, s2)
-                
-                if similarity > 0.7 and similarity > best_score:
-                    best_score = similarity
-                    best_match = s2
-        
-        return best_match
-    
-    def _sentence_similarity(self, s1: str, s2: str) -> float:
-        """Calculate similarity between two sentences."""
-        # Simple approach: count common words
-        words1 = set(s1.lower().split())
-        words2 = set(s2.lower().split())
-        
-        # Remove common stop words
-        stop_words = {'the', 'a', 'an', 'in', 'on', 'at', 'of', 'to', 'for', 'by', 'with', 'about'}
-        words1 = words1 - stop_words
-        words2 = words2 - stop_words
-        
-        # Calculate Jaccard similarity
-        intersection = len(words1.intersection(words2))
-        union = len(words1.union(words2))
-        
-        return intersection / union if union > 0 else 0
-    
-    def _generate_summary(self, score: float, matches: List[Dict[str, Any]]) -> str:
-        """Generate human-readable summary of plagiarism check."""
-        if score < 0.1:
-            return "No significant similarity detected."
-        elif score < 0.3:
-            return f"Low similarity detected with {len(matches)} sources."
-        elif score < 0.6:
-            return f"Moderate similarity detected with {len(matches)} sources. Review recommended."
-        else:
-            return f"High similarity detected with {len(matches)} sources. Detailed review required."
-    
-    def _get_severity_level(self, score: float) -> str:
-        """Get severity level based on similarity score."""
-        if score < 0.1:
-            return "none"
-        elif score < 0.3:
-            return "low"
-        elif score < 0.6:
-            return "moderate"
-        else:
-            return "high"
-    
-    def _load_reference_db(self) -> Dict[str, Any]:
-        """Load reference database from disk."""
-        db_file = Path("data/reference_db.json")
-        if db_file.exists():
-            try:
-                with open(db_file, 'r') as f:
-                    return json.load(f)
-            except Exception as e:
-                logger.error(f"Error loading reference database: {str(e)}")
-        
-        return {"entries": []}
-    
-    def _save_reference_db(self) -> None:
-        """Save reference database to disk."""
-        db_file = Path("data/reference_db.json")
-        try:
-            with open(db_file, 'w') as f:
-                json.dump(self.reference_db, f, indent=2)
-        except Exception as e:
-            logger.error(f"Error saving reference database: {str(e)}")
 
 # Utility functions
 def similarity_score(text1: str, text2: str) -> float:

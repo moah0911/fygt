@@ -386,26 +386,210 @@ class Analytics:
         }
         return reports
 
-    def analyze_student_performance(self, student_id: int) -> Dict:
+    def analyze_student_performance(self, student_id: int, submissions_data: List[Dict], courses_data: List[Dict]) -> Dict:
         """Deep analysis of student performance"""
         try:
-            performance_data = self.load_student_data(student_id)
+            # Convert submissions to DataFrame for analysis
+            submissions_df = pd.DataFrame(submissions_data)
             
-            analysis = {
-                'overall_metrics': self.calculate_overall_metrics(performance_data),
-                'subject_analysis': self.analyze_subject_wise_performance(performance_data),
-                'trend_analysis': self.analyze_performance_trends(performance_data),
-                'skill_gaps': self.identify_skill_gaps(performance_data),
-                'recommendations': self.generate_student_recommendations(performance_data)
+            if submissions_df.empty:
+                return {
+                    'status': 'no_data',
+                    'message': 'No submission data available for analysis'
+                }
+            
+            # Basic statistics
+            total_submissions = len(submissions_df)
+            graded_submissions = submissions_df[submissions_df['score'].notna()]
+            
+            if graded_submissions.empty:
+                return {
+                    'status': 'no_grades',
+                    'message': 'No graded submissions available for analysis'
+                }
+            
+            # Calculate performance metrics
+            avg_score = graded_submissions['score'].mean()
+            median_score = graded_submissions['score'].median()
+            score_std = graded_submissions['score'].std()
+            
+            # Time-based analysis
+            if 'submitted_at' in submissions_df.columns:
+                submissions_df['submitted_at'] = pd.to_datetime(submissions_df['submitted_at'])
+                submissions_df['due_date'] = pd.to_datetime(submissions_df['due_date'])
+                
+                # Calculate submission timing metrics
+                submissions_df['days_early'] = (submissions_df['due_date'] - submissions_df['submitted_at']).dt.total_seconds() / (24 * 3600)
+                on_time_rate = (submissions_df['days_early'] >= 0).mean() * 100
+                avg_days_early = submissions_df[submissions_df['days_early'] >= 0]['days_early'].mean()
+                
+                # Time series analysis
+                submissions_df = submissions_df.sort_values('submitted_at')
+                rolling_avg = submissions_df['score'].rolling(window=3, min_periods=1).mean()
+                
+                # Generate time series plot
+                plt.figure(figsize=(12, 6))
+                plt.plot(submissions_df['submitted_at'], submissions_df['score'], 'o-', label='Actual Scores')
+                plt.plot(submissions_df['submitted_at'], rolling_avg, '--', label='3-Assignment Rolling Average')
+                plt.title('Student Performance Over Time')
+                plt.xlabel('Submission Date')
+                plt.ylabel('Score')
+                plt.legend()
+                plt.grid(True)
+                
+                # Save plot
+                time_plot_path = os.path.join(self.reports_dir, f'student_{student_id}_time_series.png')
+                plt.savefig(time_plot_path)
+                plt.close()
+            else:
+                on_time_rate = None
+                avg_days_early = None
+                time_plot_path = None
+            
+            # Skills analysis from grading metadata
+            skills_data = {}
+            for sub in submissions_data:
+                if 'grading_metadata' in sub and sub['grading_metadata']:
+                    metadata = sub['grading_metadata']
+                    
+                    # Code analysis skills
+                    if 'code_analysis' in metadata:
+                        for skill, score in metadata['code_analysis'].items():
+                            if isinstance(score, (int, float)):
+                                if skill not in skills_data:
+                                    skills_data[skill] = []
+                                skills_data[skill].append(score)
+                    
+                    # Quiz/test skills
+                    if 'question_results' in metadata:
+                        for q_res in metadata['question_results']:
+                            if 'category' in q_res and 'score' in q_res:
+                                skill = q_res['category']
+                                if skill not in skills_data:
+                                    skills_data[skill] = []
+                                skills_data[skill].append(q_res['score'])
+            
+            # Calculate average skill scores
+            skill_averages = {}
+            if skills_data:
+                for skill, scores in skills_data.items():
+                    skill_averages[skill] = sum(scores) / len(scores)
+                
+                # Generate skills radar chart
+                if len(skill_averages) >= 3:
+                    categories = list(skill_averages.keys())
+                    values = list(skill_averages.values())
+                    
+                    # Create radar chart
+                    fig = plt.figure(figsize=(10, 10))
+                    ax = fig.add_subplot(111, polar=True)
+                    
+                    # Number of variables
+                    N = len(categories)
+                    
+                    # Angle of each axis
+                    angles = [n / float(N) * 2 * np.pi for n in range(N)]
+                    angles += angles[:1]
+                    
+                    # Plot data
+                    values += values[:1]
+                    ax.plot(angles, values)
+                    ax.fill(angles, values, alpha=0.25)
+                    
+                    # Fix axis to go in the right order and start at 12 o'clock
+                    ax.set_theta_offset(np.pi / 2)
+                    ax.set_theta_direction(-1)
+                    
+                    # Draw axis lines for each angle and label
+                    plt.xticks(angles[:-1], categories)
+                    
+                    # Save radar chart
+                    skills_plot_path = os.path.join(self.reports_dir, f'student_{student_id}_skills.png')
+                    plt.savefig(skills_plot_path)
+                    plt.close()
+                else:
+                    skills_plot_path = None
+            else:
+                skills_plot_path = None
+            
+            # Assignment type analysis
+            assignment_type_scores = {}
+            for sub in submissions_data:
+                if 'assignment_id' in sub and sub.get('score') is not None:
+                    for course in courses_data:
+                        for assignment in course.get('assignments', []):
+                            if assignment['id'] == sub['assignment_id']:
+                                a_type = assignment.get('assignment_type', 'other')
+                                if a_type not in assignment_type_scores:
+                                    assignment_type_scores[a_type] = []
+                                assignment_type_scores[a_type].append(sub['score'])
+            
+            # Calculate average scores by assignment type
+            type_averages = {}
+            if assignment_type_scores:
+                for a_type, scores in assignment_type_scores.items():
+                    type_averages[a_type] = sum(scores) / len(scores)
+                
+                # Generate bar chart for assignment types
+                plt.figure(figsize=(10, 6))
+                types = list(type_averages.keys())
+                scores = list(type_averages.values())
+                plt.bar(types, scores)
+                plt.title('Performance by Assignment Type')
+                plt.xlabel('Assignment Type')
+                plt.ylabel('Average Score')
+                plt.xticks(rotation=45)
+                
+                # Save chart
+                types_plot_path = os.path.join(self.reports_dir, f'student_{student_id}_types.png')
+                plt.savefig(types_plot_path, bbox_inches='tight')
+                plt.close()
+            else:
+                types_plot_path = None
+            
+            # Plagiarism analysis
+            plagiarism_scores = [
+                sub.get('grading_metadata', {}).get('plagiarism_score', 0) 
+                for sub in submissions_data
+            ]
+            high_plagiarism_count = sum(1 for score in plagiarism_scores if score > 0.7)
+            moderate_plagiarism_count = sum(1 for score in plagiarism_scores if 0.4 <= score <= 0.7)
+            low_plagiarism_count = sum(1 for score in plagiarism_scores if 0.1 <= score < 0.4)
+            
+            return {
+                'status': 'success',
+                'basic_stats': {
+                    'total_submissions': total_submissions,
+                    'average_score': round(avg_score, 2),
+                    'median_score': round(median_score, 2),
+                    'score_std': round(score_std, 2) if not np.isnan(score_std) else None,
+                    'on_time_rate': round(on_time_rate, 2) if on_time_rate is not None else None,
+                    'avg_days_early': round(avg_days_early, 2) if avg_days_early is not None else None
+                },
+                'skills_analysis': {
+                    'skill_scores': skill_averages,
+                    'skills_plot': skills_plot_path
+                },
+                'assignment_analysis': {
+                    'type_scores': type_averages,
+                    'types_plot': types_plot_path
+                },
+                'time_analysis': {
+                    'time_series_plot': time_plot_path
+                },
+                'academic_integrity': {
+                    'high_similarity': high_plagiarism_count,
+                    'moderate_similarity': moderate_plagiarism_count,
+                    'low_similarity': low_plagiarism_count
+                },
+                'generated_at': datetime.now().isoformat()
             }
-            
-            # Generate visualizations
-            self.generate_performance_visualizations(performance_data, student_id)
-            
-            return analysis
         except Exception as e:
             log_system_event(f"Error analyzing student performance: {str(e)}")
-            return None
+            return {
+                'status': 'error',
+                'message': f"Error analyzing performance: {str(e)}"
+            }
 
     def analyze_class_performance(self, class_id: int) -> Dict:
         """Comprehensive class performance analysis"""

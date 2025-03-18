@@ -27,7 +27,7 @@ class AIGradingService:
         self.cache_dir = Path("data/cache/grading")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.grading_history = {}
-        
+
     @staticmethod
     def is_available() -> bool:
         """Check if AI grading is available."""

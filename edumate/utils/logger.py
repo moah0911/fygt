@@ -51,6 +51,18 @@ def log_error(error, context=None):
     else:
         error_logger.error(str(error))
 
-def log_audit(user_id, action, details):
-    """Log audit trail entries"""
-    audit_logger.info(f"USER:{user_id} ACTION:{action} DETAILS:{details}")
+def log_audit(user_id, action, resource_type, resource_id, success, details):
+    """Log audit trail entries
+    
+    Args:
+        user_id: ID of the user performing the action
+        action: Type of action (create, read, update, delete)
+        resource_type: Type of resource being acted on (course, assignment, etc.)
+        resource_id: ID of the resource
+        success: Whether the action was successful
+        details: Additional details about the action
+    """
+    audit_logger.info(
+        f"USER:{user_id} ACTION:{action} RESOURCE:{resource_type} "
+        f"ID:{resource_id} SUCCESS:{success} DETAILS:{details}"
+    )

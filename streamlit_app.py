@@ -21,8 +21,12 @@ import nltk
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import matplotlib.pyplot as plt
+import seaborn as sns
 import sqlite3
-from typing import List
+from typing import List, Dict, Any, Union
+
+# Set matplotlib style for better looking charts
+plt.style.use('seaborn')
 
 # Import utilities
 from edumate.utils.logger import log_system_event, log_access, log_error, log_audit
@@ -532,8 +536,14 @@ def extract_images_from_pdf(pdf_path, output_dir):
         st.error(f"Error extracting images from PDF: {str(e)}")
         return []
 
+# Add imports for our enhanced grading services at the top of the file
+from edumate.services.grading_service import GradingService
+from edumate.services.plagiarism_service import PlagiarismService
+from edumate.services.feedback_service import FeedbackService
+from edumate.services.gemini_service import GeminiService
+
 def auto_grade_submission(submission_id):
-    """Automatically grade a submission using AI"""
+    """Automatically grade a submission using enhanced AI grading service"""
     submissions = load_data('submissions')
     submission = next((sub for sub in submissions if sub['id'] == submission_id), None)
     
@@ -542,10 +552,63 @@ def auto_grade_submission(submission_id):
     
     assignment = get_assignment_by_id(submission['assignment_id'])
     
-    # Analyze text content
-    content = submission['content']
+    # Initialize services
+    grading_service = GradingService()
+    feedback_service = FeedbackService()
     
-    # Also analyze file content if available
+    # Prepare submission object in the format expected by GradingService
+    submission_obj = type('SubmissionObj', (), {
+        'id': submission['id'],
+        'student_id': submission['student_id'],
+        'assignment': type('AssignmentObj', (), {
+            'id': assignment['id'],
+            'title': assignment['title'],
+            'instructions': assignment['description'],
+            'assignment_type': assignment.get('assignment_type', 'essay'),
+            'points': assignment['points'],
+            'rubric': None,  # Will be populated from data if available
+            'submissions': []
+        }),
+        'content': submission['content'],
+        'file_path': submission.get('file_info', {}).get('file_path', None),
+        'submitted_at': submission.get('submitted_at', datetime.now().isoformat()),
+        'is_graded': False,
+        'score': None,
+        'feedback': ""
+    })
+    
+    # Add rubric if available
+    if 'rubric' in assignment and assignment['rubric']:
+        rubric_data = assignment['rubric']
+        submission_obj.assignment.rubric = type('RubricObj', (), {
+            'name': rubric_data.get('name', 'Assignment Rubric'),
+            'criteria': []
+        })
+        
+        if 'criteria' in rubric_data:
+            for criterion in rubric_data['criteria']:
+                submission_obj.assignment.rubric.criteria.append(
+                    type('CriterionObj', (), {
+                        'id': criterion.get('id', 0),
+                        'name': criterion.get('name', ''),
+                        'description': criterion.get('description', ''),
+                        'max_score': criterion.get('points', 0)
+                    })
+                )
+    
+    # Get all other submissions for comparison and plagiarism detection
+    other_submissions = [
+        type('OtherSubmission', (), {
+            'id': s['id'],
+            'content': s['content'],
+            'student_id': s['student_id']
+        }) 
+        for s in submissions 
+        if s['assignment_id'] == assignment['id'] and s['id'] != submission_id
+    ]
+    submission_obj.assignment.submissions = [submission_obj] + other_submissions
+    
+    # Extract and analyze file content if available
     file_content = ""
     file_analysis = ""
     gemini_analysis = ""
@@ -567,68 +630,209 @@ def auto_grade_submission(submission_id):
                         prompt = f"This is a PDF submission for the assignment: '{assignment['title']}'. Please analyze the content, including any handwritten text. Extract all text if possible, and evaluate the answer in terms of correctness, completeness, and clarity. If there are handwritten portions, please transcribe them and include them in your analysis."
                         gemini_analysis = analyze_pdf_with_gemini(file_path, prompt)
                         
-                        # Format the analysis for display
+                        # Add to submission content for better grading
                         if gemini_analysis and not gemini_analysis.startswith("Error"):
-                            gemini_analysis = "## PDF Content Analysis\n\n" + gemini_analysis
+                            submission_obj.content += "\n\n" + gemini_analysis
                 
                 elif file_info['file_type'].endswith('docx'):
                     file_content = extract_text_from_docx(file_path)
+                    submission_obj.content += "\n\n" + file_content
                 else:
                     # For text files or other formats
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                         file_content = f.read()
+                        submission_obj.content += "\n\n" + file_content
                 
-                # Analyze the file content
-                file_analysis = analyze_file_content(file_content, file_info['filename'])
+                # Set file_content for feedback generation
+                submission_obj.file_content = file_content
+                
             except Exception as e:
                 file_analysis = f"Error analyzing file: {str(e)}"
     
-    # Simple auto-grading logic (in a real app, this would use more sophisticated AI)
-    max_points = assignment['points']
+    try:
+        # Grade the submission using our enhanced GradingService
+        graded_submission = grading_service.grade_submission(submission_obj)
+        
+        # Extract results
+        score = graded_submission.score
+        feedback = graded_submission.feedback
+        
+        # Check if we have plagiarism results
+        plagiarism_score = getattr(graded_submission, 'plagiarism_score', 0)
+        plagiarism_message = ""
+        if plagiarism_score > 0.1:
+            plagiarism_message = "\n\n## Plagiarism Alert\n"
+            if plagiarism_score > 0.7:
+                plagiarism_message += "⚠️ **High** plagiarism detected. Score has been significantly reduced."
+            elif plagiarism_score > 0.4:
+                plagiarism_message += "⚠️ **Moderate** plagiarism detected. Score has been reduced."
+            else:
+                plagiarism_message += "⚠️ **Low** similarity detected. Minor impact on score."
+                
+            # Add details from plagiarism analysis if available
+            if hasattr(graded_submission, 'plagiarism_details'):
+                details = graded_submission.plagiarism_details
+                if 'summary' in details:
+                    plagiarism_message += f"\n\n{details['summary']}"
+        
+        # Generate enhanced AI feedback
+        student_info = next((user for user in load_data('users') if user['id'] == submission['student_id']), {})
+        
+        # Get student's previous submissions for personalized feedback
+        previous_submissions = [
+            s for s in submissions 
+            if s['student_id'] == submission['student_id'] and s['id'] != submission_id and s.get('score') is not None
+        ]
+        
+        # Prepare student history context
+        student_history = {
+            'name': student_info.get('name', 'Student'),
+            'average_score': sum(s.get('score', 0) for s in previous_submissions) / max(1, len(previous_submissions)),
+            'submissions_count': len(previous_submissions)
+        }
+        
+        # Generate personalized feedback combining grading results with student history
+        ai_feedback = feedback
+        try:
+            # Enhance with feedback service if content isn't too large
+            if len(feedback) < 8000:  # Limit for API calls
+                enhanced_feedback = feedback_service.generate_feedback(
+                    {
+                        'content': submission_obj.content[:5000],  # Limit content length
+                        'score': score,
+                        'max_score': assignment['points'],
+                        'feedback_points': extract_feedback_points(feedback)
+                    },
+                    student_history=student_history
+                )
+                if enhanced_feedback and len(enhanced_feedback) > 100:
+                    ai_feedback = enhanced_feedback
+        except Exception as e:
+            # Fall back to original feedback if enhancement fails
+            print(f"Error enhancing feedback: {e}")
+            pass
+            
+        # Add plagiarism message if detected
+        if plagiarism_message:
+            ai_feedback += plagiarism_message
+        
+        # Update the submission
+        for i, sub in enumerate(submissions):
+            if sub['id'] == submission_id:
+                submissions[i]['score'] = score
+                submissions[i]['ai_feedback'] = ai_feedback
+                submissions[i]['status'] = 'auto-graded'
+                submissions[i]['graded_at'] = datetime.now().isoformat()
+                
+                # Add additional grading metadata if available
+                grading_metadata = {}
+                
+                if hasattr(graded_submission, 'plagiarism_score'):
+                    grading_metadata['plagiarism_score'] = graded_submission.plagiarism_score
+                    
+                if hasattr(graded_submission, 'milestone_completions'):
+                    grading_metadata['milestone_completions'] = graded_submission.milestone_completions
+                    
+                if hasattr(graded_submission, 'question_results'):
+                    grading_metadata['question_results'] = graded_submission.question_results
+                    
+                if hasattr(graded_submission, 'code_analysis'):
+                    grading_metadata['code_analysis'] = graded_submission.code_analysis
+                    
+                submissions[i]['grading_metadata'] = grading_metadata
+                
+                save_data(submissions, 'submissions')
+                
+                # Log the grading action
+                try:
+                    log_audit(
+                        'system',
+                        'grade',
+                        'submission',
+                        submission_id,
+                        True,
+                        f"Auto-graded submission with score {score}/{assignment['points']}"
+                    )
+                except Exception as e:
+                    print(f"Error logging audit: {e}")
+                
+                return True, f"Submission auto-graded with score {score}/{assignment['points']}"
+        
+        return False, "Failed to update submission"
+        
+    except Exception as e:
+        # Fall back to simpler grading if the enhanced service fails
+        print(f"Enhanced grading failed: {e}")
+        
+        # Combine text and file content for analysis
+        combined_content = submission['content'] + "\n" + file_content
+        word_count = len(combined_content.split())
+        max_points = assignment['points']
+        
+        # Base score on word count and quality indicators
+        if word_count < 50:
+            score = max_points * 0.6  # 60% for very brief answers
+        elif word_count < 100:
+            score = max_points * 0.7  # 70% for short answers
+        elif word_count < 200:
+            score = max_points * 0.8  # 80% for medium answers
+        else:
+            score = max_points * 0.9  # 90% for long answers
+        
+        # If we have Gemini analysis, adjust the score based on that
+        if gemini_analysis:
+            # Give a higher base score for handwritten submissions that were analyzed
+            score = max_points * 0.85
+        
+        # Adjust score based on quality indicators
+        if "because" in combined_content.lower() or "therefore" in combined_content.lower():
+            score += max_points * 0.05  # Bonus for reasoning
+        
+        if len(combined_content.split('.')) > 5:
+            score += max_points * 0.05  # Bonus for good structure
+        
+        # Round the score
+        score = round(min(score, max_points))
+        
+        # Generate AI feedback
+        ai_feedback = generate_ai_feedback(submission, file_content, file_analysis, gemini_analysis)
+        
+        # Update the submission
+        for i, sub in enumerate(submissions):
+            if sub['id'] == submission_id:
+                submissions[i]['score'] = score
+                submissions[i]['ai_feedback'] = ai_feedback
+                submissions[i]['status'] = 'auto-graded'
+                submissions[i]['graded_at'] = datetime.now().isoformat()
+                save_data(submissions, 'submissions')
+                return True, f"Submission auto-graded with score {score}/{max_points} (fallback method)"
+        
+        return False, "Failed to update submission"
+
+def extract_feedback_points(feedback):
+    """Extract key feedback points from grading feedback."""
+    points = []
     
-    # Combine text and file content for analysis
-    combined_content = content + "\n" + file_content
-    word_count = len(combined_content.split())
+    # Extract strengths section
+    strengths_match = re.search(r'(?:STRENGTHS|Strengths):(.*?)(?:\n\n|\n[A-Z]|$)', feedback, re.DOTALL | re.IGNORECASE)
+    if strengths_match:
+        strengths_text = strengths_match.group(1)
+        strength_points = re.findall(r'[-*•]\s*(.*?)(?:\n[-*•]|\n\n|$)', strengths_text, re.DOTALL)
+        for point in strength_points:
+            if point.strip():
+                points.append({"type": "strength", "text": point.strip()})
+                
+    # Extract weaknesses/areas for improvement section
+    weaknesses_match = re.search(r'(?:WEAKNESSES|AREAS FOR IMPROVEMENT|Areas for improvement|Weaknesses):(.*?)(?:\n\n|\n[A-Z]|$)', 
+                                feedback, re.DOTALL | re.IGNORECASE)
+    if weaknesses_match:
+        weaknesses_text = weaknesses_match.group(1)
+        weakness_points = re.findall(r'[-*•]\s*(.*?)(?:\n[-*•]|\n\n|$)', weaknesses_text, re.DOTALL)
+        for point in weakness_points:
+            if point.strip():
+                points.append({"type": "weakness", "text": point.strip()})
     
-    # Base score on word count and quality indicators
-    if word_count < 50:
-        score = max_points * 0.6  # 60% for very brief answers
-    elif word_count < 100:
-        score = max_points * 0.7  # 70% for short answers
-    elif word_count < 200:
-        score = max_points * 0.8  # 80% for medium answers
-    else:
-        score = max_points * 0.9  # 90% for long answers
-    
-    # If we have Gemini analysis, adjust the score based on that
-    if gemini_analysis:
-        # Give a higher base score for handwritten submissions that were analyzed
-        score = max_points * 0.85
-    
-    # Adjust score based on quality indicators
-    if "because" in combined_content.lower() or "therefore" in combined_content.lower():
-        score += max_points * 0.05  # Bonus for reasoning
-    
-    if len(combined_content.split('.')) > 5:
-        score += max_points * 0.05  # Bonus for good structure
-    
-    # Round the score
-    score = round(min(score, max_points))
-    
-    # Generate AI feedback
-    ai_feedback = generate_ai_feedback(submission, file_content, file_analysis, gemini_analysis)
-    
-    # Update the submission
-    for i, sub in enumerate(submissions):
-        if sub['id'] == submission_id:
-            submissions[i]['score'] = score
-            submissions[i]['ai_feedback'] = ai_feedback
-            submissions[i]['status'] = 'auto-graded'
-            submissions[i]['graded_at'] = datetime.now().isoformat()
-            save_data(submissions, 'submissions')
-            return True, f"Submission auto-graded with score {score}/{max_points}"
-    
-    return False, "Failed to update submission"
+    return points
 
 def extract_text_from_pdf(file_path):
     """Extract text from a PDF file"""
@@ -1932,11 +2136,13 @@ By the end of this lesson, students will be able to:
                 st.write("- Collaborative projects")
 
 def show_student_dashboard():
-    # Get student's courses
-    courses = get_student_courses(st.session_state.current_user['id'])
+    # Get student's courses and data
+    student_id = st.session_state.current_user['id']
+    courses = get_student_courses(student_id)
+    submissions = get_student_submissions(student_id)
     
     # Dashboard tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Courses", "Assignments", "Career Planning"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Courses", "Assignments", "Performance Analytics", "Career Planning"])
     
     with tab1:
         # Display stats
@@ -1954,7 +2160,6 @@ def show_student_dashboard():
         
         with col3:
             # Count submissions
-            submissions = get_student_submissions(st.session_state.current_user['id'])
             st.metric("Submissions", len(submissions))
     
     with tab2:
@@ -2049,6 +2254,138 @@ def show_student_dashboard():
                         st.rerun()
     
     with tab4:
+        # Performance Analytics
+        st.subheader("Your Performance Analytics")
+        
+        if not submissions:
+            st.info("You haven't submitted any assignments yet. Analytics will be available after you submit assignments.")
+        else:
+            # Get enhanced analytics
+            analytics_data = analytics.analyze_student_performance(student_id, submissions, courses)
+            
+            if analytics_data['status'] == 'error':
+                st.error(analytics_data['message'])
+            elif analytics_data['status'] in ['no_data', 'no_grades']:
+                st.info(analytics_data['message'])
+            else:
+                # Overall Performance Metrics
+                st.subheader("Overall Performance")
+                
+                basic_stats = analytics_data['basic_stats']
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.metric(
+                        "Average Score", 
+                        f"{basic_stats['average_score']:.1f}",
+                        f"±{basic_stats['score_std']:.1f}" if basic_stats['score_std'] else None
+                    )
+                
+                with col2:
+                    if basic_stats['on_time_rate'] is not None:
+                        st.metric(
+                            "On-time Submission Rate",
+                            f"{basic_stats['on_time_rate']:.1f}%",
+                            f"{basic_stats['avg_days_early']:.1f} days early (avg)" if basic_stats['avg_days_early'] else None
+                        )
+                
+                with col3:
+                    st.metric("Total Submissions", basic_stats['total_submissions'])
+                
+                # Performance Over Time
+                st.subheader("Performance Trend")
+                if analytics_data['time_analysis']['time_series_plot']:
+                    st.image(analytics_data['time_analysis']['time_series_plot'])
+                else:
+                    st.info("Time series analysis will be available after more submissions are graded.")
+                
+                # Skills Analysis
+                if analytics_data['skills_analysis']['skill_scores']:
+                    st.subheader("Skills Analysis")
+                    
+                    if analytics_data['skills_analysis']['skills_plot']:
+                        st.image(analytics_data['skills_analysis']['skills_plot'])
+                    
+                    # Show skills breakdown
+                    skills_df = pd.DataFrame([
+                        {"Skill": skill, "Score": score} 
+                        for skill, score in analytics_data['skills_analysis']['skill_scores'].items()
+                    ])
+                    skills_df = skills_df.sort_values('Score', ascending=False)
+                    
+                    st.write("Skills Breakdown:")
+                    for _, row in skills_df.iterrows():
+                        col1, col2 = st.columns([1, 3])
+                        with col1:
+                            st.write(f"**{row['Skill'].title()}:**")
+                        with col2:
+                            score = row['Score']
+                            if score < 0.4:
+                                st.write("🟠 Needs significant improvement")
+                            elif score < 0.7:
+                                st.write("🟡 Good progress, but continue practicing")
+                            else:
+                                st.write("🟢 Strong skill, keep up the good work")
+                
+                # Assignment Type Analysis
+                if analytics_data['assignment_analysis']['type_scores']:
+                    st.subheader("Performance by Assignment Type")
+                    if analytics_data['assignment_analysis']['types_plot']:
+                        st.image(analytics_data['assignment_analysis']['types_plot'])
+                    
+                    # Show type breakdown
+                    types_df = pd.DataFrame([
+                        {"Type": type_, "Average Score": score} 
+                        for type_, score in analytics_data['assignment_analysis']['type_scores'].items()
+                    ])
+                    types_df = types_df.sort_values('Average Score', ascending=False)
+                    
+                    st.write("Assignment Type Breakdown:")
+                    st.dataframe(types_df.style.format({"Average Score": "{:.1f}"}))
+                
+                # Academic Integrity Section
+                academic_integrity = analytics_data['academic_integrity']
+                total_flagged = sum([
+                    academic_integrity['high_similarity'],
+                    academic_integrity['moderate_similarity'],
+                    academic_integrity['low_similarity']
+                ])
+                
+                if total_flagged > 0:
+                    st.subheader("Academic Integrity Overview")
+                    
+                    with st.expander("View Academic Integrity Information"):
+                        col1, col2, col3 = st.columns(3)
+                        
+                        with col1:
+                            if academic_integrity['high_similarity'] > 0:
+                                st.error(f"🚫 High Similarity: {academic_integrity['high_similarity']} submissions")
+                        
+                        with col2:
+                            if academic_integrity['moderate_similarity'] > 0:
+                                st.warning(f"⚠️ Moderate Similarity: {academic_integrity['moderate_similarity']} submissions")
+                        
+                        with col3:
+                            if academic_integrity['low_similarity'] > 0:
+                                st.info(f"ℹ️ Low Similarity: {academic_integrity['low_similarity']} submissions")
+                        
+                        st.write("""
+                        **Understanding Similarity Scores:**
+                        - High Similarity (>70%): May indicate significant content matching with other sources
+                        - Moderate Similarity (40-70%): Some overlapping content detected
+                        - Low Similarity (10-40%): Minor matches that may be coincidental
+                        
+                        **Tips for Maintaining Academic Integrity:**
+                        - Always cite your sources properly
+                        - Use quotation marks for direct quotes
+                        - Paraphrase in your own words
+                        - Ask your instructor if unsure about citation rules
+                        """)
+                
+                # Last updated timestamp
+                st.caption(f"Analytics last updated: {analytics_data['generated_at']}")
+    
+    with tab5:
         show_career_planning()
 
 def show_career_planning():
@@ -2395,7 +2732,7 @@ def show_career_planning():
             
             for i, phase in enumerate(timeline_data):
                 col1, col2 = st.columns([1, 4])
-                with col1:
+                        with col1:
                     st.markdown(f"### {i+1}.")
                 with col2:
                     st.markdown(f"**{phase['phase']}**")
@@ -3069,8 +3406,8 @@ def show_home_page():
     with col2:
         st.markdown("### 📊 Insightful Analytics")
         st.write("Track student progress and identify learning gaps with comprehensive analytics.")
-    
-    with col3:
+                        
+                        with col3:
         st.markdown("### 📝 Personalized Feedback")
         st.write("Students receive detailed, personalized feedback to improve their learning.")
     

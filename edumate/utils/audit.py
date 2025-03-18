@@ -35,7 +35,14 @@ class AuditTrail:
         
         self.audit_data.append(entry)
         self.save_audit_trail()
-        log_audit(user_id, action, json.dumps(details))
+        
+        # Extract resource type and ID from details if available
+        resource_type = details.get('resource_type', 'unknown')
+        resource_id = details.get('resource_id', 0)
+        success = details.get('success', True)
+        
+        # Log with the updated signature
+        log_audit(user_id, action, resource_type, resource_id, success, json.dumps(details))
 
     def get_user_actions(self, user_id, start_date=None, end_date=None):
         """Get all actions performed by a user within a date range"""
