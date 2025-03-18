@@ -1,22 +1,24 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
-import json
 import os
+import base64
+import json
+import time
+import re
 import random
 import string
-import base64
+from datetime import datetime, timedelta, date
 import io
-import re
 import tempfile
 import requests
 from PIL import Image
+import matplotlib
+matplotlib.use('Agg')
 try:
     import pymupdf  # Use pymupdf instead of fitz
 except ImportError:
     st.error("Please install PyMuPDF: pip install PyMuPDF")
     pymupdf = None
-from dotenv import load_dotenv
 import nltk
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,9 +26,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import sqlite3
 from typing import List, Dict, Any, Union
+from dotenv import load_dotenv
 
 # Set matplotlib style for better looking charts
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8')
 
 # Import utilities
 from edumate.utils.logger import log_system_event, log_access, log_error, log_audit
@@ -39,8 +42,46 @@ from edumate.utils.exam_manager import ExamManager
 from edumate.utils.classroom_manager import ClassroomManager
 from edumate.utils.teacher_tools import TeacherTools
 
+# Import services
+from edumate.services import (
+    GeminiService, 
+    GradingService, 
+    FeedbackService, 
+    PlagiarismService,
+    AIService,
+    AIGradingService,
+    StudyRecommendationsService,
+    GroupFormationService,
+    LearningPathService,
+    MultilingualFeedbackService,
+    TeacherAnalyticsService
+)
+
 # Load environment variables from .env file
 load_dotenv()
+
+# Initialize utilities
+encryptor = Encryptor()
+analytics = Analytics('data')
+audit_trail = AuditTrail('data')
+career_planner = CareerPlanner('data')
+indian_education = IndianEducationSystem()
+exam_manager = ExamManager()
+classroom_manager = ClassroomManager()
+teacher_tools = TeacherTools()
+
+# Initialize services
+gemini_service = GeminiService()  # Initialize with your API key
+grading_service = GradingService(gemini_service=gemini_service)
+feedback_service = FeedbackService(gemini_service=gemini_service)
+plagiarism_service = PlagiarismService()
+ai_service = AIService(gemini_service=gemini_service)
+ai_grading_service = AIGradingService(gemini_service=gemini_service)
+study_recommendations_service = StudyRecommendationsService(gemini_service=gemini_service)
+group_formation_service = GroupFormationService()
+learning_path_service = LearningPathService()
+multilingual_feedback_service = MultilingualFeedbackService(gemini_service=gemini_service)
+teacher_analytics_service = TeacherAnalyticsService()
 
 # Set page configuration
 st.set_page_config(
@@ -49,16 +90,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# Initialize utilities
-encryptor = Encryptor()
-analytics = Analytics('data')
-audit_trail = AuditTrail('data')
-career_planner = CareerPlanner('data')
-indian_education = IndianEducationSystem()
-exam_manager = ExamManager('data')
-classroom_manager = ClassroomManager('data')
-teacher_tools = TeacherTools(data_dir="data/teacher_tools")  # Updated path
 
 # Initialize session state variables if they don't exist
 if 'logged_in' not in st.session_state:
@@ -543,271 +574,135 @@ from edumate.services.feedback_service import FeedbackService
 from edumate.services.gemini_service import GeminiService
 
 def auto_grade_submission(submission_id):
-    """Automatically grade a submission using enhanced AI grading service"""
-    submissions = load_data('submissions')
-    submission = next((sub for sub in submissions if sub['id'] == submission_id), None)
-    
-    if not submission:
-        return False, "Submission not found"
-    
-    assignment = get_assignment_by_id(submission['assignment_id'])
-    
-    # Initialize services
-    grading_service = GradingService()
-    feedback_service = FeedbackService()
-    
-    # Prepare submission object in the format expected by GradingService
-    submission_obj = type('SubmissionObj', (), {
-        'id': submission['id'],
-        'student_id': submission['student_id'],
-        'assignment': type('AssignmentObj', (), {
-            'id': assignment['id'],
-            'title': assignment['title'],
-            'instructions': assignment['description'],
-            'assignment_type': assignment.get('assignment_type', 'essay'),
-            'points': assignment['points'],
-            'rubric': None,  # Will be populated from data if available
-            'submissions': []
-        }),
-        'content': submission['content'],
-        'file_path': submission.get('file_info', {}).get('file_path', None),
-        'submitted_at': submission.get('submitted_at', datetime.now().isoformat()),
-        'is_graded': False,
-        'score': None,
-        'feedback': ""
-    })
-    
-    # Add rubric if available
-    if 'rubric' in assignment and assignment['rubric']:
-        rubric_data = assignment['rubric']
-        submission_obj.assignment.rubric = type('RubricObj', (), {
-            'name': rubric_data.get('name', 'Assignment Rubric'),
-            'criteria': []
-        })
+    """
+    Automatically grade a submission using AI.
+    Returns: (success, message)
+    """
+    try:
+        # Load submissions and get the specific submission
+        submissions = load_data('submissions')
+        submission = next((s for s in submissions if s['id'] == submission_id), None)
         
-        if 'criteria' in rubric_data:
-            for criterion in rubric_data['criteria']:
-                submission_obj.assignment.rubric.criteria.append(
-                    type('CriterionObj', (), {
-                        'id': criterion.get('id', 0),
-                        'name': criterion.get('name', ''),
-                        'description': criterion.get('description', ''),
-                        'max_score': criterion.get('points', 0)
-                    })
-                )
-    
-    # Get all other submissions for comparison and plagiarism detection
-    other_submissions = [
-        type('OtherSubmission', (), {
-            'id': s['id'],
-            'content': s['content'],
-            'student_id': s['student_id']
-        }) 
-        for s in submissions 
-        if s['assignment_id'] == assignment['id'] and s['id'] != submission_id
-    ]
-    submission_obj.assignment.submissions = [submission_obj] + other_submissions
-    
-    # Extract and analyze file content if available
-    file_content = ""
-    file_analysis = ""
-    gemini_analysis = ""
-    
-    if submission.get('file_info'):
-        file_info = submission['file_info']
-        file_path = file_info['file_path']
+        if not submission:
+            return False, "Submission not found."
         
-        if os.path.exists(file_path):
+        # Get the assignment details
+        assignment = get_assignment_by_id(submission['assignment_id'])
+        if not assignment:
+            return False, "Assignment not found."
+        
+        # Use the GradingService to grade the submission
+        file_content = ""
+        file_analysis = ""
+        
+        # Get file content if available
+        if submission.get('file_info'):
+            file_path = submission['file_info']['file_path']
+            file_type = submission['file_info']['file_type']
+            
             try:
                 # Extract text based on file type
-                if file_info['file_type'].endswith('pdf'):
-                    # First try to extract text
+                if file_type == 'application/pdf':
                     file_content = extract_text_from_pdf(file_path)
-                    
-                    # If it's likely a handwritten PDF (little text extracted), process with Gemini
-                    if len(file_content.split()) < 20 or "[PDF content extracted" in file_content:
-                        # Send the PDF directly to Gemini for analysis
-                        prompt = f"This is a PDF submission for the assignment: '{assignment['title']}'. Please analyze the content, including any handwritten text. Extract all text if possible, and evaluate the answer in terms of correctness, completeness, and clarity. If there are handwritten portions, please transcribe them and include them in your analysis."
-                        gemini_analysis = analyze_pdf_with_gemini(file_path, prompt)
-                        
-                        # Add to submission content for better grading
-                        if gemini_analysis and not gemini_analysis.startswith("Error"):
-                            submission_obj.content += "\n\n" + gemini_analysis
-                
-                elif file_info['file_type'].endswith('docx'):
+                elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                     file_content = extract_text_from_docx(file_path)
-                    submission_obj.content += "\n\n" + file_content
                 else:
-                    # For text files or other formats
+                    # For other file types, try to read as text
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                         file_content = f.read()
-                        submission_obj.content += "\n\n" + file_content
                 
-                # Set file_content for feedback generation
-                submission_obj.file_content = file_content
-                
+                # Analyze file content
+                file_analysis = analyze_file_content(file_content, submission['file_info']['filename'])
             except Exception as e:
+                log_error(f"Error processing file for auto-grading: {str(e)}")
                 file_analysis = f"Error analyzing file: {str(e)}"
-    
-    try:
-        # Grade the submission using our enhanced GradingService
-        graded_submission = grading_service.grade_submission(submission_obj)
         
-        # Extract results
-        score = graded_submission.score
-        feedback = graded_submission.feedback
-        
-        # Check if we have plagiarism results
-        plagiarism_score = getattr(graded_submission, 'plagiarism_score', 0)
-        plagiarism_message = ""
-        if plagiarism_score > 0.1:
-            plagiarism_message = "\n\n## Plagiarism Alert\n"
-            if plagiarism_score > 0.7:
-                plagiarism_message += "⚠️ **High** plagiarism detected. Score has been significantly reduced."
-            elif plagiarism_score > 0.4:
-                plagiarism_message += "⚠️ **Moderate** plagiarism detected. Score has been reduced."
-            else:
-                plagiarism_message += "⚠️ **Low** similarity detected. Minor impact on score."
-                
-            # Add details from plagiarism analysis if available
-            if hasattr(graded_submission, 'plagiarism_details'):
-                details = graded_submission.plagiarism_details
-                if 'summary' in details:
-                    plagiarism_message += f"\n\n{details['summary']}"
-        
-        # Generate enhanced AI feedback
-        student_info = next((user for user in load_data('users') if user['id'] == submission['student_id']), {})
-        
-        # Get student's previous submissions for personalized feedback
-        previous_submissions = [
-            s for s in submissions 
-            if s['student_id'] == submission['student_id'] and s['id'] != submission_id and s.get('score') is not None
-        ]
-        
-        # Prepare student history context
-        student_history = {
-            'name': student_info.get('name', 'Student'),
-            'average_score': sum(s.get('score', 0) for s in previous_submissions) / max(1, len(previous_submissions)),
-            'submissions_count': len(previous_submissions)
-        }
-        
-        # Generate personalized feedback combining grading results with student history
-        ai_feedback = feedback
-        try:
-            # Enhance with feedback service if content isn't too large
-            if len(feedback) < 8000:  # Limit for API calls
-                enhanced_feedback = feedback_service.generate_feedback(
-                    {
-                        'content': submission_obj.content[:5000],  # Limit content length
-                        'score': score,
-                        'max_score': assignment['points'],
-                        'feedback_points': extract_feedback_points(feedback)
-                    },
-                    student_history=student_history
-                )
-                if enhanced_feedback and len(enhanced_feedback) > 100:
-                    ai_feedback = enhanced_feedback
-        except Exception as e:
-            # Fall back to original feedback if enhancement fails
-            print(f"Error enhancing feedback: {e}")
-            pass
+        # Get combined content
+        combined_content = submission['content']
+        if file_content:
+            combined_content += "\n\n" + file_content
             
-        # Add plagiarism message if detected
-        if plagiarism_message:
-            ai_feedback += plagiarism_message
+        # Get assignment rubric
+        rubric = assignment.get('rubric', {})
+        if not rubric:
+            # Generate a simple default rubric
+            rubric = {
+                "criteria": [
+                    {"name": "Content", "weight": 40, "description": "Completeness and quality of content"},
+                    {"name": "Understanding", "weight": 30, "description": "Demonstrates understanding of concepts"},
+                    {"name": "Presentation", "weight": 20, "description": "Organization and clarity"},
+                    {"name": "Technical", "weight": 10, "description": "Technical correctness"}
+                ],
+                "total_points": assignment.get("points", 100)
+            }
+            
+        # Get grading result using our service
+        grading_result = grading_service.grade_submission(
+            content=combined_content,
+            assignment_details={
+                "title": assignment.get("title", ""),
+                "description": assignment.get("description", ""),
+                "points": assignment.get("points", 100),
+                "rubric": rubric
+            },
+            file_analysis=file_analysis,
+            student_id=submission.get("student_id", ""),
+            submission_type=assignment.get("type", "assignment")
+        )
         
-        # Update the submission
-        for i, sub in enumerate(submissions):
-            if sub['id'] == submission_id:
-                submissions[i]['score'] = score
-                submissions[i]['ai_feedback'] = ai_feedback
-                submissions[i]['status'] = 'auto-graded'
-                submissions[i]['graded_at'] = datetime.now().isoformat()
+        # Check for plagiarism if the service is available
+        plagiarism_result = {"score": 0, "matches": []}
+        try:
+            plagiarism_result = plagiarism_service.check_plagiarism(
+                content=combined_content,
+                student_id=submission.get("student_id", ""),
+                assignment_id=assignment.get("id", "")
+            )
+            
+            # Adjust score based on plagiarism if detected
+            if plagiarism_result["score"] > 30:  # Over 30% plagiarism
+                reduction = min(grading_result["score"] * (plagiarism_result["score"]/200), 25)  # Max 25% reduction
+                grading_result["score"] -= reduction
+                grading_result["feedback"] += f"\n\n⚠️ **Plagiarism Warning**: This submission shows {plagiarism_result['score']:.1f}% similarity with existing sources. Points have been deducted accordingly."
                 
-                # Add additional grading metadata if available
-                grading_metadata = {}
-                
-                if hasattr(graded_submission, 'plagiarism_score'):
-                    grading_metadata['plagiarism_score'] = graded_submission.plagiarism_score
-                    
-                if hasattr(graded_submission, 'milestone_completions'):
-                    grading_metadata['milestone_completions'] = graded_submission.milestone_completions
-                    
-                if hasattr(graded_submission, 'question_results'):
-                    grading_metadata['question_results'] = graded_submission.question_results
-                    
-                if hasattr(graded_submission, 'code_analysis'):
-                    grading_metadata['code_analysis'] = graded_submission.code_analysis
-                    
-                submissions[i]['grading_metadata'] = grading_metadata
-                
-                save_data(submissions, 'submissions')
-                
-                # Log the grading action
-                try:
-                    log_audit(
-                        'system',
-                        'grade',
-                        'submission',
-                        submission_id,
-                        True,
-                        f"Auto-graded submission with score {score}/{assignment['points']}"
-                    )
-                except Exception as e:
-                    print(f"Error logging audit: {e}")
-                
-                return True, f"Submission auto-graded with score {score}/{assignment['points']}"
+        except Exception as e:
+            log_error(f"Error checking plagiarism: {str(e)}")
+            
+        # Generate AI feedback (comprehensive version from service)
+        ai_feedback = grading_result.get("feedback", "")
+        if not ai_feedback:
+            # Fallback to legacy feedback generator if service doesn't provide feedback
+            ai_feedback = generate_ai_feedback(submission, file_content, file_analysis)
         
-        return False, "Failed to update submission"
+        # Update the submission with AI-graded score and feedback
+        submission['score'] = round(grading_result["score"])
+        submission['feedback'] = grading_result.get("comments", "")
+        submission['ai_feedback'] = ai_feedback
+        submission['ai_suggestions'] = grading_result.get("suggestions", {})
+        submission['rubric_scores'] = grading_result.get("rubric_scores", {})
+        submission['graded_by'] = 'ai'
+        submission['graded_at'] = datetime.now().isoformat()
+        submission['plagiarism_data'] = plagiarism_result
+        
+        # Save the updated submissions
+        save_data(submissions, 'submissions')
+        
+        # Log the action
+        log_audit(
+            user_id=0,  # 0 indicates system/AI
+            action='grade',
+            resource_type='submission',
+            resource_id=submission_id,
+            success=True,
+            details=f"Auto-graded submission with score: {submission['score']}"
+        )
+        
+        return True, f"Submission auto-graded successfully with score: {submission['score']}"
         
     except Exception as e:
-        # Fall back to simpler grading if the enhanced service fails
-        print(f"Enhanced grading failed: {e}")
-        
-        # Combine text and file content for analysis
-        combined_content = submission['content'] + "\n" + file_content
-        word_count = len(combined_content.split())
-        max_points = assignment['points']
-        
-        # Base score on word count and quality indicators
-        if word_count < 50:
-            score = max_points * 0.6  # 60% for very brief answers
-        elif word_count < 100:
-            score = max_points * 0.7  # 70% for short answers
-        elif word_count < 200:
-            score = max_points * 0.8  # 80% for medium answers
-        else:
-            score = max_points * 0.9  # 90% for long answers
-        
-        # If we have Gemini analysis, adjust the score based on that
-        if gemini_analysis:
-            # Give a higher base score for handwritten submissions that were analyzed
-            score = max_points * 0.85
-        
-        # Adjust score based on quality indicators
-        if "because" in combined_content.lower() or "therefore" in combined_content.lower():
-            score += max_points * 0.05  # Bonus for reasoning
-        
-        if len(combined_content.split('.')) > 5:
-            score += max_points * 0.05  # Bonus for good structure
-        
-        # Round the score
-        score = round(min(score, max_points))
-        
-        # Generate AI feedback
-        ai_feedback = generate_ai_feedback(submission, file_content, file_analysis, gemini_analysis)
-        
-        # Update the submission
-        for i, sub in enumerate(submissions):
-            if sub['id'] == submission_id:
-                submissions[i]['score'] = score
-                submissions[i]['ai_feedback'] = ai_feedback
-                submissions[i]['status'] = 'auto-graded'
-                submissions[i]['graded_at'] = datetime.now().isoformat()
-                save_data(submissions, 'submissions')
-                return True, f"Submission auto-graded with score {score}/{max_points} (fallback method)"
-        
-        return False, "Failed to update submission"
+        error_message = f"Error auto-grading submission: {str(e)}"
+        log_error(error_message)
+        return False, error_message
 
 def extract_feedback_points(feedback):
     """Extract key feedback points from grading feedback."""
@@ -2138,1882 +2033,1335 @@ By the end of this lesson, students will be able to:
 def show_student_dashboard():
     # Get student's courses and data
     student_id = st.session_state.current_user['id']
-    courses = get_student_courses(student_id)
-    submissions = get_student_submissions(student_id)
+    student_name = st.session_state.current_user['name']
     
-    # Dashboard tabs
+    st.title(f"Welcome, {student_name}!")
+    
+    # Get student's courses
+    courses = get_student_courses(student_id)
+    
+    # Show different tabs for different views
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Courses", "Assignments", "Performance Analytics", "Career Planning"])
     
+    # Overview tab
     with tab1:
-        # Display stats
+        st.header("Dashboard Overview")
+        
+        # Show quick stats
         col1, col2, col3 = st.columns(3)
+        
         with col1:
-            st.metric("Enrolled Courses", len(courses))
+            st.metric("Courses", len(courses))
+        
+        # Get submissions data
+        submissions = get_student_submissions(student_id)
         
         with col2:
-            # Count assignments
-            assignment_count = 0
-            for course in courses:
-                assignments = get_course_assignments(course['id'])
-                assignment_count += len(assignments)
-            st.metric("Assignments", assignment_count)
+            st.metric("Assignments", len(submissions))
         
         with col3:
-            # Count submissions
-            st.metric("Submissions", len(submissions))
-    
-    with tab2:
-        # Course enrollment
-        st.subheader("Enroll in a Course")
+            # Calculate completion rate
+            completed = sum(1 for s in submissions if s.get('score') is not None)
+            completion_rate = (completed / max(1, len(submissions))) * 100
+            st.metric("Completion Rate", f"{completion_rate:.1f}%")
         
-        # Get all courses
-        all_courses = load_data('courses')
-        available_courses = [course for course in all_courses if st.session_state.current_user['id'] not in course['students']]
-        
-        if available_courses:
-            course_options = {f"{course['name']} ({course['code']})": course['id'] for course in available_courses}
-            selected_course = st.selectbox("Select a course", list(course_options.keys()))
-            
-            if st.button("Enroll", key="enroll_btn"):
-                course_id = course_options[selected_course]
-                success, message = enroll_student(course_id, st.session_state.current_user['id'])
-                if success:
-                    st.success(message)
-                    st.rerun()
-                else:
-                    st.error(message)
-        else:
-            st.info("No available courses to enroll in.")
-        
-        # Display enrolled courses
-        st.subheader("Your Courses")
-        
-        if not courses:
-            st.info("You haven't enrolled in any courses yet.")
-        else:
-            for course in courses:
-                col1, col2, col3 = st.columns([3, 1, 1])
-                with col1:
-                    st.write(f"### {course['name']} ({course['code']})")
-                    st.write(course['description'])
-                    teacher = get_user_by_id(course['teacher_id'])
-                    st.write(f"**Teacher:** {teacher['name']}")
-                with col2:
-                    assignments = get_course_assignments(course['id'])
-                    st.write(f"**Assignments:** {len(assignments)}")
-                with col3:
-                    if st.button("View Course", key=f"view_course_{course['id']}"):
-                        st.session_state.current_course = course
-                        st.session_state.current_page = 'course_detail'
-                        st.rerun()
-                st.markdown("---")
-    
-    with tab3:
-        # Show assignments across all courses
-        st.subheader("Your Assignments")
-        
-        all_assignments = []
-        for course in courses:
-            course_assignments = get_course_assignments(course['id'])
-            for assignment in course_assignments:
-                all_assignments.append({
-                    "assignment": assignment,
-                    "course": course
-                })
-        
-        if not all_assignments:
-            st.info("You don't have any assignments yet.")
-        else:
-            # Sort by due date
-            all_assignments.sort(key=lambda x: x["assignment"]["due_date"])
-            
-            for item in all_assignments:
-                assignment = item["assignment"]
-                course = item["course"]
-                
-                # Check submission status
-                submissions = get_assignment_submissions(assignment['id'])
-                student_submission = next((sub for sub in submissions if sub['student_id'] == st.session_state.current_user['id']), None)
-                
-                status = "📝 Not Submitted"
-                if student_submission:
-                    if student_submission['status'] == 'graded' or student_submission['status'] == 'auto-graded':
-                        status = f"✅ Graded: {student_submission['score']}/{assignment['points']}"
-                    else:
-                        status = "✓ Submitted"
-                
-                # Display assignment card
-                with st.expander(f"{assignment['title']} - {course['name']} - Due: {assignment['due_date']} - {status}"):
-                    st.write(f"**Course:** {course['name']}")
-                    st.write(f"**Description:** {assignment['description']}")
-                    st.write(f"**Points:** {assignment['points']}")
-                    
-                    if st.button("View Details", key=f"view_assignment_{assignment['id']}"):
-                        st.session_state.current_course = course
-                        st.session_state.current_page = 'course_detail'
-                        st.rerun()
-    
-    with tab4:
-        # Performance Analytics
-        st.subheader("Your Performance Analytics")
+        # Recent activity
+        st.subheader("Recent Activity")
         
         if not submissions:
-            st.info("You haven't submitted any assignments yet. Analytics will be available after you submit assignments.")
+            st.info("No submissions yet. Enroll in courses and start submitting assignments!")
         else:
-            # Get enhanced analytics
-            analytics_data = analytics.analyze_student_performance(student_id, submissions, courses)
+            # Sort submissions by date (newest first)
+            submissions.sort(key=lambda x: x.get('submitted_at', ''), reverse=True)
             
-            if analytics_data['status'] == 'error':
-                st.error(analytics_data['message'])
-            elif analytics_data['status'] in ['no_data', 'no_grades']:
-                st.info(analytics_data['message'])
-            else:
-                # Overall Performance Metrics
-                st.subheader("Overall Performance")
-                
-                basic_stats = analytics_data['basic_stats']
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.metric(
-                        "Average Score", 
-                        f"{basic_stats['average_score']:.1f}",
-                        f"±{basic_stats['score_std']:.1f}" if basic_stats['score_std'] else None
-                    )
-                
-                with col2:
-                    if basic_stats['on_time_rate'] is not None:
-                        st.metric(
-                            "On-time Submission Rate",
-                            f"{basic_stats['on_time_rate']:.1f}%",
-                            f"{basic_stats['avg_days_early']:.1f} days early (avg)" if basic_stats['avg_days_early'] else None
-                        )
-                
-                with col3:
-                    st.metric("Total Submissions", basic_stats['total_submissions'])
-                
-                # Performance Over Time
-                st.subheader("Performance Trend")
-                if analytics_data['time_analysis']['time_series_plot']:
-                    st.image(analytics_data['time_analysis']['time_series_plot'])
-                else:
-                    st.info("Time series analysis will be available after more submissions are graded.")
-                
-                # Skills Analysis
-                if analytics_data['skills_analysis']['skill_scores']:
-                    st.subheader("Skills Analysis")
+            # Show last 5 submissions
+            for submission in submissions[:5]:
+                assignment = get_assignment_by_id(submission.get('assignment_id'))
+                if assignment:
+                    course = get_course_by_id(assignment.get('course_id'))
+                    course_name = course.get('name', 'Unknown Course') if course else 'Unknown Course'
                     
-                    if analytics_data['skills_analysis']['skills_plot']:
-                        st.image(analytics_data['skills_analysis']['skills_plot'])
-                    
-                    # Show skills breakdown
-                    skills_df = pd.DataFrame([
-                        {"Skill": skill, "Score": score} 
-                        for skill, score in analytics_data['skills_analysis']['skill_scores'].items()
-                    ])
-                    skills_df = skills_df.sort_values('Score', ascending=False)
-                    
-                    st.write("Skills Breakdown:")
-                    for _, row in skills_df.iterrows():
-                        col1, col2 = st.columns([1, 3])
-                        with col1:
-                            st.write(f"**{row['Skill'].title()}:**")
-                        with col2:
-                            score = row['Score']
-                            if score < 0.4:
-                                st.write("🟠 Needs significant improvement")
-                            elif score < 0.7:
-                                st.write("🟡 Good progress, but continue practicing")
-                            else:
-                                st.write("🟢 Strong skill, keep up the good work")
-                
-                # Assignment Type Analysis
-                if analytics_data['assignment_analysis']['type_scores']:
-                    st.subheader("Performance by Assignment Type")
-                    if analytics_data['assignment_analysis']['types_plot']:
-                        st.image(analytics_data['assignment_analysis']['types_plot'])
-                    
-                    # Show type breakdown
-                    types_df = pd.DataFrame([
-                        {"Type": type_, "Average Score": score} 
-                        for type_, score in analytics_data['assignment_analysis']['type_scores'].items()
-                    ])
-                    types_df = types_df.sort_values('Average Score', ascending=False)
-                    
-                    st.write("Assignment Type Breakdown:")
-                    st.dataframe(types_df.style.format({"Average Score": "{:.1f}"}))
-                
-                # Academic Integrity Section
-                academic_integrity = analytics_data['academic_integrity']
-                total_flagged = sum([
-                    academic_integrity['high_similarity'],
-                    academic_integrity['moderate_similarity'],
-                    academic_integrity['low_similarity']
-                ])
-                
-                if total_flagged > 0:
-                    st.subheader("Academic Integrity Overview")
-                    
-                    with st.expander("View Academic Integrity Information"):
-                        col1, col2, col3 = st.columns(3)
-                        
-                        with col1:
-                            if academic_integrity['high_similarity'] > 0:
-                                st.error(f"🚫 High Similarity: {academic_integrity['high_similarity']} submissions")
-                        
-                        with col2:
-                            if academic_integrity['moderate_similarity'] > 0:
-                                st.warning(f"⚠️ Moderate Similarity: {academic_integrity['moderate_similarity']} submissions")
-                        
-                        with col3:
-                            if academic_integrity['low_similarity'] > 0:
-                                st.info(f"ℹ️ Low Similarity: {academic_integrity['low_similarity']} submissions")
-                        
-                        st.write("""
-                        **Understanding Similarity Scores:**
-                        - High Similarity (>70%): May indicate significant content matching with other sources
-                        - Moderate Similarity (40-70%): Some overlapping content detected
-                        - Low Similarity (10-40%): Minor matches that may be coincidental
-                        
-                        **Tips for Maintaining Academic Integrity:**
-                        - Always cite your sources properly
-                        - Use quotation marks for direct quotes
-                        - Paraphrase in your own words
-                        - Ask your instructor if unsure about citation rules
-                        """)
-                
-                # Last updated timestamp
-                st.caption(f"Analytics last updated: {analytics_data['generated_at']}")
-    
-    with tab5:
-        show_career_planning()
-
-def show_career_planning():
-    """Display career planning interface with AI recommendations."""
-    st.header("Career Planning with AI")
-    
-    # Create tabs for different career planning features
-    career_tab1, career_tab2, career_tab3, career_tab4, career_tab5 = st.tabs([
-        "Career Profile", 
-        "Career Recommendations", 
-        "Education System", 
-        "Exam Preparation",
-        "Learning Resources"
-    ])
-    
-    with career_tab1:
-        # Get student data
-        student_id = st.session_state.current_user['id']
-        student_data = career_planner.get_student_data(student_id)
-        
-        # If no student data exists, create a profile
-        if not student_data:
-            st.subheader("Create Your Career Profile")
-            
-            with st.form("career_profile_form"):
-                st.write("Let's set up your career profile to get personalized recommendations.")
-                
-                # Academic interests
-                st.subheader("Academic Interests")
-                interests = st.multiselect(
-                    "Select your academic interests",
-                    options=[
-                        "Computer Science", "Engineering", "Mathematics", "Physics", 
-                        "Chemistry", "Biology", "Medicine", "Business", "Economics",
-                        "Psychology", "Sociology", "History", "Literature", "Arts",
-                        "Education", "Law", "Political Science", "Environmental Science"
-                    ]
-                )
-                
-                # Skills assessment
-                st.subheader("Skills Assessment")
-                technical_skills = st.slider("Technical/Analytical Skills", 1, 10, 5)
-                creative_skills = st.slider("Creative/Artistic Skills", 1, 10, 5)
-                communication_skills = st.slider("Communication/People Skills", 1, 10, 5)
-                leadership_skills = st.slider("Leadership/Management Skills", 1, 10, 5)
-                
-                # Career preferences
-                st.subheader("Career Preferences")
-                work_environment = st.selectbox(
-                    "Preferred Work Environment",
-                    options=["Office/Corporate", "Remote/WFH", "Field Work", "Mixed/Hybrid", "Academic/Research"]
-                )
-                
-                work_values = st.multiselect(
-                    "What do you value most in a career?",
-                    options=[
-                        "High Income", "Work-Life Balance", "Job Security", 
-                        "Making a Difference", "Creativity", "Independence",
-                        "Leadership Opportunities", "Continuous Learning"
-                    ]
-                )
-                
-                # Educational background
-                st.subheader("Educational Background")
-                education_level = st.selectbox(
-                    "Current/Expected Education Level",
-                    options=["High School", "Associate's Degree", "Bachelor's Degree", "Master's Degree", "Doctorate"]
-                )
-                
-                # Additional information
-                st.subheader("Additional Information")
-                career_goals = st.text_area("Describe your career goals and aspirations")
-                
-                submit_button = st.form_submit_button("Create Profile")
-                
-                if submit_button:
-                    if not interests or not work_values:
-                        st.error("Please select at least one interest and one work value.")
-                    elif not career_goals:
-                        st.error("Please describe your career goals.")
-                    else:
-                        # Create profile data
-                        profile_data = {
-                            'student_id': student_id,
-                            'interests': interests,
-                            'skills': {
-                                'technical': technical_skills,
-                                'creative': creative_skills,
-                                'communication': communication_skills,
-                                'leadership': leadership_skills
-                            },
-                            'preferences': {
-                                'work_environment': work_environment,
-                                'work_values': work_values
-                            },
-                            'education': {
-                                'level': education_level
-                            },
-                            'goals': career_goals,
-                            'created_at': datetime.now().isoformat(),
-                            'updated_at': datetime.now().isoformat()
-                        }
-                        
-                        # Save to file
-                        student_file = os.path.join('data', f'student_{student_id}.json')
-                        with open(student_file, 'w') as f:
-                            json.dump(profile_data, f, indent=4)
-                        
-                        st.success("Career profile created successfully!")
-                        st.rerun()
-        else:
-            # Display existing profile
-            st.subheader("Your Profile")
-            
-            # Display profile information
-            st.write("**Interests:**")
-            for interest in student_data.get('interests', []):
-                st.write(f"- {interest}")
-            
-            st.write("**Skills:**")
-            skills = student_data.get('skills', {})
-            
-            # Create radar chart for skills
-            if skills:
-                skill_labels = ['Technical', 'Creative', 'Communication', 'Leadership']
-                skill_values = [
-                    skills.get('technical', 0),
-                    skills.get('creative', 0),
-                    skills.get('communication', 0),
-                    skills.get('leadership', 0)
-                ]
-                
-                # Create radar chart
-                fig = plt.figure(figsize=(4, 4))
-                ax = fig.add_subplot(111, polar=True)
-                
-                # Plot the skills
-                angles = np.linspace(0, 2*np.pi, len(skill_labels), endpoint=False).tolist()
-                skill_values.append(skill_values[0])  # Close the loop
-                angles.append(angles[0])  # Close the loop
-                
-                ax.plot(angles, skill_values)
-                ax.fill(angles, skill_values, alpha=0.25)
-                ax.set_thetagrids(np.degrees(angles[:-1]), skill_labels)
-                ax.set_ylim(0, 10)
-                ax.grid(True)
-                
-                st.pyplot(fig)
-            
-            # Display preferences
-            preferences = student_data.get('preferences', {})
-            if preferences:
-                st.write(f"**Work Environment:** {preferences.get('work_environment', 'Not specified')}")
-                
-                st.write("**Work Values:**")
-                for value in preferences.get('work_values', []):
-                    st.write(f"- {value}")
-            
-            # Display education
-            education = student_data.get('education', {})
-            if education:
-                st.write(f"**Education Level:** {education.get('level', 'Not specified')}")
-            
-            # Display goals
-            st.write("**Career Goals:**")
-            st.write(student_data.get('goals', 'Not specified'))
-            
-            # Edit profile button
-            if st.button("Edit Profile"):
-                # Set session state to edit mode
-                st.session_state.edit_career_profile = True
-                st.rerun()
-    
-    with career_tab2:
-        # Only show recommendations if profile exists
-        student_id = st.session_state.current_user['id']
-        student_data = career_planner.get_student_data(student_id)
-        
-        if not student_data:
-            st.info("Please create your career profile first to get personalized recommendations.")
-        else:
-            st.subheader("Career Recommendations")
-            
-            # Generate career recommendations
-            career_paths = career_planner.generate_career_paths(student_id)
-            
-            if not career_paths or not career_paths.get('recommended_careers'):
-                # Use AI to generate recommendations
-                with st.spinner("Generating career recommendations..."):
-                    # Simulate AI processing
-                    import time
-                    time.sleep(2)
-                    
-                    # Generate recommendations based on profile
-                    interests = student_data.get('interests', [])
-                    skills = student_data.get('skills', {})
-                    
-                    # Map interests to career fields
-                    career_recommendations = []
-                    
-                    # Tech-related careers
-                    if "Computer Science" in interests or "Engineering" in interests:
-                        if skills.get('technical', 0) > 7:
-                            career_recommendations.append({
-                                'title': 'Software Engineer',
-                                'match': 95,
-                                'description': 'Design, develop, and maintain software systems and applications.',
-                                'outlook': 'Excellent job growth expected over the next decade.',
-                                'salary_range': '$70,000 - $150,000',
-                                'education': "Bachelor's degree in Computer Science or related field",
-                                'skills_needed': ['Programming', 'Problem Solving', 'Algorithms', 'Data Structures']
-                            })
-                        
-                        if skills.get('creative', 0) > 6:
-                            career_recommendations.append({
-                                'title': 'UX/UI Designer',
-                                'match': 88,
-                                'description': 'Design user interfaces and experiences for websites and applications.',
-                                'outlook': 'Strong demand as companies focus on user experience.',
-                                'salary_range': '$65,000 - $120,000',
-                                'education': "Bachelor's degree in Design, HCI, or related field",
-                                'skills_needed': ['Design Thinking', 'Wireframing', 'User Research', 'Visual Design']
-                            })
-                    
-                    # Business-related careers
-                    if "Business" in interests or "Economics" in interests:
-                        if skills.get('leadership', 0) > 7:
-                            career_recommendations.append({
-                                'title': 'Product Manager',
-                                'match': 90,
-                                'description': 'Lead product development and strategy.',
-                                'outlook': 'Growing demand across tech and other industries.',
-                                'salary_range': '$80,000 - $160,000',
-                                'education': "Bachelor's degree in Business, Engineering, or related field",
-                                'skills_needed': ['Strategic Thinking', 'Communication', 'Market Analysis', 'Leadership']
-                            })
-                    
-                    # Science-related careers
-                    if "Biology" in interests or "Chemistry" in interests or "Environmental Science" in interests:
-                        career_recommendations.append({
-                            'title': 'Research Scientist',
-                            'match': 85,
-                            'description': 'Conduct research to advance knowledge in your field.',
-                            'outlook': 'Steady growth with opportunities in academia and industry.',
-                            'salary_range': '$60,000 - $130,000',
-                            'education': "PhD in relevant scientific field",
-                            'skills_needed': ['Research Methods', 'Data Analysis', 'Critical Thinking', 'Technical Writing']
-                        })
-                    
-                    # Add more general recommendations if needed
-                    if len(career_recommendations) < 2:
-                        career_recommendations.append({
-                            'title': 'Data Analyst',
-                            'match': 80,
-                            'description': 'Analyze data to help organizations make better decisions.',
-                            'outlook': 'Strong growth as companies increasingly rely on data.',
-                            'salary_range': '$60,000 - $110,000',
-                            'education': "Bachelor's degree in Statistics, Mathematics, or related field",
-                            'skills_needed': ['Statistical Analysis', 'Data Visualization', 'SQL', 'Problem Solving']
-                        })
-                    
-                    # Sort by match percentage
-                    career_recommendations.sort(key=lambda x: x['match'], reverse=True)
-                    
-                    # Store recommendations
-                    career_paths = {
-                        'recommended_careers': career_recommendations,
-                        'skill_gaps': ['Advanced Programming', 'Machine Learning', 'Public Speaking'],
-                        'required_qualifications': ['Bachelor\'s Degree', 'Internship Experience'],
-                        'industry_insights': 'Technology and data-driven fields are showing the strongest growth.',
-                        'generated_at': datetime.now().isoformat()
-                    }
-                    
-                    # Save recommendations
-                    recommendations_file = os.path.join('data', f'career_recommendations_{student_id}.json')
-                    with open(recommendations_file, 'w') as f:
-                        json.dump(career_paths, f, indent=4)
-            
-            # Display career recommendations
-            if career_paths and career_paths.get('recommended_careers'):
-                for career in career_paths['recommended_careers']:
-                    with st.expander(f"{career['title']} - {career['match']}% Match"):
-                        st.write(f"**Description:** {career['description']}")
-                        st.write(f"**Job Outlook:** {career['outlook']}")
-                        st.write(f"**Salary Range:** {career['salary_range']}")
-                        st.write(f"**Required Education:** {career['education']}")
-                        
-                        st.write("**Key Skills Needed:**")
-                        for skill in career['skills_needed']:
-                            st.write(f"- {skill}")
-                        
-                        # Add a button to explore this career path further
-                        if st.button("Explore This Career Path", key=f"explore_{career['title'].replace(' ', '_')}"):
-                            st.session_state.selected_career = career['title']
-                            st.rerun()
-            
-            # Display skill gaps and recommendations
-            if career_paths and career_paths.get('skill_gaps'):
-                st.subheader("Skill Development Recommendations")
-                
-                st.write("To improve your career prospects, consider developing these skills:")
-                for skill in career_paths['skill_gaps']:
-                    st.write(f"- {skill}")
-                
-                # Course recommendations based on skill gaps
-                st.write("**Recommended Courses:**")
-                
-                # Simulate course recommendations
-                courses = [
-                    {
-                        'title': 'Introduction to Machine Learning',
-                        'platform': 'Coursera',
-                        'duration': '8 weeks',
-                        'link': 'https://www.coursera.org/learn/machine-learning'
-                    },
-                    {
-                        'title': 'Public Speaking Fundamentals',
-                        'platform': 'Udemy',
-                        'duration': '4 weeks',
-                        'link': 'https://www.udemy.com/course/public-speaking-fundamentals/'
-                    },
-                    {
-                        'title': 'Advanced Programming Techniques',
-                        'platform': 'edX',
-                        'duration': '10 weeks',
-                        'link': 'https://www.edx.org/course/advanced-programming'
-                    }
-                ]
-                
-                for course in courses:
-                    st.markdown(f"**[{course['title']}]({course['link']})** - {course['platform']} ({course['duration']})")
-            
-            # Career roadmap
-            st.subheader("Your Career Roadmap")
-            
-            # Create a timeline visualization
-            timeline_data = [
-                {"phase": "Education", "description": "Complete your degree with relevant coursework"},
-                {"phase": "Skill Building", "description": "Develop technical and soft skills through courses and projects"},
-                {"phase": "Internship", "description": "Gain practical experience through internships"},
-                {"phase": "Entry-Level Position", "description": "Start your career with an entry-level role"},
-                {"phase": "Career Growth", "description": "Advance to more senior positions"}
-            ]
-            
-            for i, phase in enumerate(timeline_data):
-                col1, col2 = st.columns([1, 4])
-                with col1:
-                    st.markdown(f"### {i+1}.")
-                with col2:
-                    st.markdown(f"**{phase['phase']}**")
-                    st.write(phase['description'])
-                
-                if i < len(timeline_data) - 1:
-                    st.markdown("↓")
-            
-            # AI career advisor
-            st.subheader("Ask the AI Career Advisor")
-            
-            career_question = st.text_input("Ask a question about your career path")
-            
-            if career_question and st.button("Get Advice"):
-                with st.spinner("Generating advice..."):
-                    # Simulate AI response
-                    import time
-                    time.sleep(2)
-                    
-                    # Generate a response based on the question
-                    if "salary" in career_question.lower():
-                        response = "Salary expectations vary by location, experience, and specific role. For entry-level positions in your recommended fields, you can expect $60,000-$80,000 annually. With 5+ years of experience, this can increase to $100,000+. To maximize your earning potential, focus on developing specialized skills and gaining experience in high-demand areas."
-                    elif "education" in career_question.lower() or "degree" in career_question.lower():
-                        response = "Based on your interests, a Bachelor's degree in Computer Science, Data Science, or Business Analytics would be most beneficial. Consider complementing your degree with certifications in specialized areas like machine learning, data visualization, or project management to stand out to employers."
-                    elif "internship" in career_question.lower():
-                        response = "Internships are crucial for gaining practical experience. Look for opportunities at technology companies, research institutions, or data-driven organizations. Start applying 6-9 months before your desired start date, and highlight relevant coursework and projects in your application."
-                    else:
-                        response = "Based on your profile and interests, I recommend focusing on building a strong foundation in both technical and soft skills. Technical skills like programming and data analysis are in high demand, while communication and problem-solving abilities will help you stand out. Consider joining professional organizations and attending industry events to build your network."
-                    
-                    st.markdown(f"**AI Advisor:** {response}")
-    
-    with career_tab3:
-        # Show Indian Education System information
-        show_indian_education_options()
-    
-    with career_tab4:
-        # Show exam information
-        show_exam_information()
-    
-    with career_tab5:
-        # Show learning resources from classroom manager
-        st.header("Learning Resources")
-        
-        # Get available resources from classroom manager
-        resources = classroom_manager.get_learning_resources()
-        
-        if not resources:
-            st.info("No learning resources available at this time.")
-        else:
-            # Create resource categories
-            resource_categories = {}
-            for resource in resources:
-                category = resource.get('category', 'Other')
-                if category not in resource_categories:
-                    resource_categories[category] = []
-                resource_categories[category].append(resource)
-            
-            # Display resources by category
-            for category, category_resources in resource_categories.items():
-                st.subheader(category)
-                
-                for resource in category_resources:
-                    with st.expander(resource.get('title', 'Unknown Resource')):
-                        st.write(f"**Description:** {resource.get('description', 'No description available.')}")
-                        
-                        # Display resource type and format
-                        st.write(f"**Type:** {resource.get('type', 'N/A')}")
-                        st.write(f"**Format:** {resource.get('format', 'N/A')}")
-                        
-                        # Display author/creator
-                        if resource.get('author'):
-                            st.write(f"**Author/Creator:** {resource.get('author')}")
-                        
-                        # Display tags
-                        if resource.get('tags'):
-                            st.write("**Tags:**")
-                            tags_html = " ".join([f'<span style="background-color: #f0f0f0; padding: 2px 6px; border-radius: 10px; margin-right: 5px;">{tag}</span>' for tag in resource.get('tags')])
-                            st.markdown(tags_html, unsafe_allow_html=True)
-                        
-                        # Display link if available
-                        if resource.get('url'):
-                            st.markdown(f"**[Access Resource]({resource.get('url')})**")
-                        
-                        # Display rating if available
-                        if resource.get('rating'):
-                            st.write(f"**Rating:** {'⭐' * int(resource.get('rating', 0))}")
-            
-            # Search for resources
-            st.subheader("Search Resources")
-            search_query = st.text_input("Search for resources by keyword")
-            
-            if search_query:
-                # Filter resources by search query
-                search_results = []
-                for resource in resources:
-                    # Search in title, description, and tags
-                    title = resource.get('title', '').lower()
-                    description = resource.get('description', '').lower()
-                    tags = ' '.join(resource.get('tags', [])).lower()
-                    
-                    if search_query.lower() in title or search_query.lower() in description or search_query.lower() in tags:
-                        search_results.append(resource)
-                
-                if search_results:
-                    st.subheader(f"Search Results ({len(search_results)})")
-                    for resource in search_results:
-                        st.markdown(f"**[{resource.get('title')}]({resource.get('url')})**")
-                        st.write(resource.get('description', 'No description available.'))
-                        st.markdown("---")
-                else:
-                    st.info("No resources found matching your search query.")
-
-def show_course_detail():
-    course = st.session_state.current_course
-    st.title(f"{course['name']} ({course['code']})")
-    
-    # Course info
-    st.write(course['description'])
-    teacher = get_user_by_id(course['teacher_id'])
-    st.write(f"**Teacher:** {teacher['name']}")
-    st.write(f"**Period:** {course['start_date']} to {course['end_date']}")
-    
-    # Tabs for different sections
-    tab1, tab2, tab3 = st.tabs(["Assignments", "Students", "Announcements"])
-    
-    with tab1:
-        show_course_assignments(course)
-    
-    with tab2:
-        show_course_students(course)
-    
-    with tab3:
-        show_course_announcements(course)
-    
-    # Back button
-    if st.button("Back to Dashboard", key="back_to_dashboard_btn"):
-        st.session_state.current_page = 'dashboard'
-        st.rerun()
-
-def show_course_assignments(course):
-    st.subheader("Assignments")
-    
-    # Create new assignment (teacher only)
-    if st.session_state.current_user['role'] == 'teacher' and st.session_state.current_user['id'] == course['teacher_id']:
-        with st.expander("Create New Assignment"):
-            with st.form("create_assignment_form"):
-                title = st.text_input("Title")
-                description = st.text_area("Description")
-                due_date = st.date_input("Due Date")
-                points = st.number_input("Points", min_value=1, max_value=100, value=100)
-                submit = st.form_submit_button("Create Assignment")
-                
-                if submit:
-                    if not title:
-                        st.error("Please enter a title")
-                    else:
-                        success, message = create_assignment(
-                            title,
-                            description,
-                            course['id'],
-                            st.session_state.current_user['id'],
-                            due_date.isoformat(),
-                            points
-                        )
-                        if success:
-                            st.success(message)
-                            st.rerun()
-                        else:
-                            st.error(message)
-    
-    # Display assignments
-    assignments = get_course_assignments(course['id'])
-    
-    if not assignments:
-        st.info("No assignments yet.")
-    else:
-        for assignment in assignments:
-            with st.expander(f"{assignment['title']} - Due: {assignment['due_date']}"):
-                st.write(assignment['description'])
-                st.write(f"**Points:** {assignment['points']}")
-                
-                # Different actions based on role
-                if st.session_state.current_user['role'] == 'teacher':
-                    # Show submissions
-                    submissions = get_assignment_submissions(assignment['id'])
-                    st.write(f"**Submissions:** {len(submissions)}")
-                    
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        if st.button("View Submissions", key=f"view_submissions_{assignment['id']}"):
-                            st.session_state.current_assignment = assignment
-                            st.session_state.current_page = 'assignment_submissions'
-                            st.rerun()
-                    
-                    # Add delete button for teachers who own the assignment
-                    if st.session_state.current_user['id'] == assignment['teacher_id']:
-                        with col2:
-                            delete_key = f"delete_assignment_{assignment['id']}"
-                            
-                            # Create a unique key for the confirmation state
-                            confirm_key = f"confirm_delete_assignment_{assignment['id']}"
-                            if confirm_key not in st.session_state:
-                                st.session_state[confirm_key] = False
-                            
-                            # Show delete button or confirmation buttons based on state
-                            if not st.session_state[confirm_key]:
-                                if st.button("Delete", key=delete_key):
-                                    st.session_state[confirm_key] = True
-                                    st.rerun()
-                            else:
-                                col2a, col2b = st.columns(2)
-                                with col2a:
-                                    if st.button("Cancel", key=f"cancel_{delete_key}"):
-                                        st.session_state[confirm_key] = False
-                                        st.rerun()
-                                with col2b:
-                                    if st.button("Confirm", key=f"confirm_{delete_key}", type="primary"):
-                                        success, message = delete_assignment(assignment['id'], st.session_state.current_user['id'])
-                                        if success:
-                                            st.success(message)
-                                            # Reset confirmation state
-                                            st.session_state[confirm_key] = False
-                                            st.rerun()
-                                        else:
-                                            st.error(message)
-                                            # Keep confirmation state active
-                                            st.rerun()
-                else:
-                    # Check if already submitted
-                    submissions = get_assignment_submissions(assignment['id'])
-                    student_submission = next((sub for sub in submissions if sub['student_id'] == st.session_state.current_user['id']), None)
-                    
-                    if student_submission:
-                        st.write("**Status:** Submitted")
-                        
-                        # Show submission content and file info
-                        cols = st.columns([2, 1])
-                        with cols[0]:
-                            st.subheader("Submission Content")
-                            if student_submission.get('content'):
-                                st.write(student_submission['content'])
-                        
-                        with cols[1]:
-                            st.subheader("Actions")
-                            if student_submission.get('file_info'):
-                                file_info = student_submission['file_info']
-                                st.write("📎 **File Attached:** " + file_info['filename'])
-                                
-                                # Create a download link if the file exists
-                                if os.path.exists(file_info['file_path']):
-                                    download_link = get_file_download_link(file_info['file_path'], file_info['filename'])
-                                    st.markdown(download_link, unsafe_allow_html=True)
-                            
-                            # Add delete button or confirmation buttons based on state
-                            if student_submission['status'] == 'submitted':
-                                col1, col2 = st.columns([3, 1])
-                                with col1:
-                                    st.write("**Submission Date:** " + student_submission['submitted_at'].split('T')[0])
-                                with col2:
-                                    delete_key = f"delete_submission_{student_submission['id']}"
-                                    
-                                    # Create a unique key for the confirmation state
-                                    confirm_key = f"confirm_delete_{student_submission['id']}"
-                                    if confirm_key not in st.session_state:
-                                        st.session_state[confirm_key] = False
-                                    
-                                    # Show delete button or confirmation buttons based on state
-                                    if not st.session_state[confirm_key]:
-                                        if st.button("Delete Submission", key=delete_key):
-                                            st.session_state[confirm_key] = True
-                                            st.rerun()
-                                    else:
-                                        col2a, col2b = st.columns(2)
-                                        with col2a:
-                                            if st.button("Cancel", key=f"cancel_{delete_key}"):
-                                                st.session_state[confirm_key] = False
-                                                st.rerun()
-                                        with col2b:
-                                            if st.button("Confirm", key=f"confirm_{delete_key}", type="primary"):
-                                                success, message = delete_submission(student_submission['id'], st.session_state.current_user['id'])
-                                                if success:
-                                                    st.success(message)
-                                                    # Reset confirmation state
-                                                    st.session_state[confirm_key] = False
-                                                    st.rerun()
-                                                else:
-                                                    st.error(message)
-                                                    # Keep confirmation state active
-                                                    st.rerun()
-                        
-                        if student_submission['status'] == 'graded' or student_submission['status'] == 'auto-graded':
-                            st.write(f"**Score:** {student_submission['score']} / {assignment['points']}")
-                            
-                            # Display regular feedback if available
-                            if student_submission.get('feedback'):
-                                st.write("**Teacher Feedback:**")
-                                st.write(student_submission['feedback'])
-                            
-                            # Display AI feedback if available
-                            if student_submission.get('ai_feedback'):
-                                st.markdown("**AI-Generated Feedback and Analysis:**")
-                                st.markdown("---")
-                                st.markdown(student_submission['ai_feedback'])
-                                st.markdown("---")
-                    else:
-                        st.write("**Status:** Not submitted")
-                        
-                        # Submit form
-                        with st.form(f"submit_assignment_{assignment['id']}"):
-                            content = st.text_area("Your Answer")
-                            uploaded_file = st.file_uploader("Upload File", type=['pdf', 'docx', 'txt'])
-                            submit_button = st.form_submit_button("Submit Assignment")
-                            
-                            if submit_button:
-                                if not content:
-                                    st.error("Please enter your answer")
-                                else:
-                                    success, message = submit_assignment(
-                                        assignment['id'],
-                                        st.session_state.current_user['id'],
-                                        content,
-                                        uploaded_file
-                                    )
-                                    if success:
-                                        st.success(message)
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
-
-def show_course_students(course):
-    st.subheader("Students")
-    
-    # Get student details
-    student_ids = course['students']
-    
-    if not student_ids:
-        st.info("No students enrolled yet.")
-    else:
-        # Create a table of students
-        students_data = []
-        for student_id in student_ids:
-            student = get_user_by_id(student_id)
-            if student:
-                # Get submission stats
-                assignments = get_course_assignments(course['id'])
-                submissions = get_student_submissions(student_id)
-                course_submissions = [sub for sub in submissions if get_assignment_by_id(sub['assignment_id'])['course_id'] == course['id']]
-                
-                students_data.append({
-                    "Name": student['name'],
-                    "Email": student['email'],
-                    "Submissions": f"{len(course_submissions)}/{len(assignments)}",
-                    "Joined": student['created_at'].split('T')[0]
-                })
-        
-        if students_data:
-            st.dataframe(pd.DataFrame(students_data))
-
-def show_course_announcements(course):
-    """Display and manage announcements for a course."""
-    st.header("Announcements")
-    
-    # Get announcements for this course
-    announcements = load_data('announcements')
-    course_announcements = [a for a in announcements if a.get('course_id') == course['id']]
-    
-    # Sort announcements by date (newest first)
-    course_announcements.sort(key=lambda x: x.get('created_at', ''), reverse=True)
-    
-    # Check if user is the teacher of this course
-    is_teacher = st.session_state.current_user['id'] == course['teacher_id']
-    
-    # Add new announcement (teachers only)
-    if is_teacher:
-        with st.expander("Create New Announcement", expanded=False):
-            with st.form("new_announcement_form"):
-                title = st.text_input("Title")
-                content = st.text_area("Content", height=150)
-                important = st.checkbox("Mark as Important")
-                
-                submitted = st.form_submit_button("Post Announcement")
-                if submitted and title and content:
-                    # Create new announcement
-                    new_announcement = {
-                        'id': len(announcements) + 1,
-                        'course_id': course['id'],
-                        'user_id': st.session_state.current_user['id'],
-                        'title': title,
-                        'content': content,
-                        'important': important,
-                        'created_at': datetime.now().isoformat(),
-                        'comments': []
-                    }
-                    
-                    # Add to announcements
-                    announcements.append(new_announcement)
-                    save_data(announcements, 'announcements')
-                    
-                    # Log the action
-                    log_audit(
-                        st.session_state.current_user['id'],
-                        'create',
-                        'announcement',
-                        new_announcement['id'],
-                        True,
-                        f"Created announcement: {title}"
-                    )
-                    
-                    st.success("Announcement posted successfully!")
-                    st.rerun()
-    
-    # Display announcements
-    if not course_announcements:
-        st.info("No announcements yet.")
-    else:
-        for announcement in course_announcements:
-            with st.container():
-                col1, col2 = st.columns([5, 1])
-                
-                # Format the announcement
-                with col1:
-                    # Title with important badge if needed
-                    if announcement.get('important'):
-                        st.markdown(f"### {announcement['title']} 🔴")
-                    else:
-                        st.markdown(f"### {announcement['title']}")
-                    
-                    # Author and date
-                    author = get_user_by_id(announcement['user_id'])
-                    author_name = author['name'] if author else "Unknown"
-                    created_date = announcement.get('created_at', '')
-                    if created_date:
+                    # Format submission date
+                    submission_date = submission.get('submitted_at', '')
+                    if submission_date:
                         try:
-                            created_date = datetime.fromisoformat(created_date).strftime("%B %d, %Y at %I:%M %p")
+                            submission_date = datetime.fromisoformat(submission_date).strftime("%B %d, %Y")
                         except:
                             pass
                     
-                    st.markdown(f"*Posted by {author_name} on {created_date}*")
-                    
-                    # Content
-                    st.markdown(announcement['content'])
-                
-                # Actions column
-                with col2:
-                    if is_teacher:
-                        if st.button("Delete", key=f"delete_announcement_{announcement['id']}"):
-                            # Remove announcement
-                            announcements = [a for a in announcements if a['id'] != announcement['id']]
-                            save_data(announcements, 'announcements')
-                            
-                            # Log the action
-                            log_audit(
-                                st.session_state.current_user['id'],
-                                'delete',
-                                'announcement',
-                                announcement['id'],
-                                True,
-                                f"Deleted announcement: {announcement['title']}"
-                            )
-                            
-                            st.success("Announcement deleted.")
-                            st.rerun()
-                
-                # Comments section
-                with st.expander(f"Comments ({len(announcement.get('comments', []))})"):
-                    # Display existing comments
-                    for comment in announcement.get('comments', []):
-                        comment_author = get_user_by_id(comment['user_id'])
-                        comment_author_name = comment_author['name'] if comment_author else "Unknown"
-                        
-                        st.markdown(f"**{comment_author_name}**: {comment['content']}")
-                        st.markdown(f"*{comment.get('created_at', '')}*")
-                        st.divider()
-                    
-                    # Add new comment
-                    with st.form(key=f"comment_form_{announcement['id']}"):
-                        comment_text = st.text_area("Add a comment", key=f"comment_text_{announcement['id']}")
-                        submit_comment = st.form_submit_button("Post Comment")
-                        
-                        if submit_comment and comment_text:
-                            # Add comment to the announcement
-                            new_comment = {
-                                'id': len(announcement.get('comments', [])) + 1,
-                                'user_id': st.session_state.current_user['id'],
-                                'content': comment_text,
-                                'created_at': datetime.now().isoformat()
-                            }
-                            
-                            if 'comments' not in announcement:
-                                announcement['comments'] = []
-                            
-                            announcement['comments'].append(new_comment)
-                            save_data(announcements, 'announcements')
-                            
-                            # Log the action
-                            log_audit(
-                                st.session_state.current_user['id'],
-                                'create',
-                                'comment',
-                                new_comment['id'],
-                                True,
-                                f"Added comment to announcement: {announcement['title']}"
-                            )
-                            
-                            st.success("Comment added.")
-                            st.rerun()
-                
-                st.divider()
-
-def show_assignment_submissions():
-    assignment = st.session_state.current_assignment
-    st.title(f"Submissions for {assignment['title']}")
+                    # Check if graded
+                    if submission.get('score') is not None:
+                        st.success(f"{assignment.get('title')} - {course_name} - Scored {submission.get('score')}/{assignment.get('points', 100)} - {submission_date}")
+                    else:
+            skill['proficiency'] = 0
+            
+        # Define status based on proficiency
+        if skill['proficiency'] >= 0.8:
+            skill['status'] = "mastered"
+        elif skill['proficiency'] >= 0.6:
+            skill['status'] = "proficient"
+        elif skill['proficiency'] > 0:
+            skill['status'] = "developing"
+        else:
+            skill['status'] = "not_started"
     
-    # Get course and submissions
-    course = get_course_by_id(assignment['course_id'])
-    submissions = get_assignment_submissions(assignment['id'])
+    # Get learning path visualization
+    with st.spinner("Generating your learning path..."):
+        learning_path = learning_path_service.generate_learning_path(
+            student_id=student_id,
+            course_id=selected_course['id'],
+            skill_data=list(skill_data.values())
+        )
     
-    st.write(f"**Course:** {course['name']} ({course['code']})")
-    st.write(f"**Due Date:** {assignment['due_date']}")
-    st.write(f"**Total Submissions:** {len(submissions)}")
+    # Display learning path visualization
+    if learning_path.get("status") == "error":
+        st.error(f"Error generating learning path: {learning_path.get('message')}")
+        return
     
-    # Add model selection with descriptions
-    with st.expander("AI Grading Settings"):
-        st.write("Select Gemini Models for Evaluation:")
-        selected_models = {}
-        for model, description in GEMINI_MODELS.items():
-            col1, col2 = st.columns([1, 3])
-            with col1:
-                selected = st.checkbox(model, key=f"model_{model}")
-            with col2:
-                st.caption(description)
-            if selected:
-                selected_models[model] = description
-        
-        if not selected_models:
-            st.warning("Please select at least one model for evaluation")
+    # Display skill graph
+    st.subheader("Your Skill Map")
     
-    # Display submissions
-    if not submissions:
-        st.info("No submissions yet.")
+    # Get the visualization data
+    viz_data = learning_path.get("visualization", {})
+    
+    if viz_data.get("html"):
+        # Display interactive graph
+        st.components.v1.html(viz_data.get("html"), height=500)
+    elif viz_data.get("image_path"):
+        # Display static image
+        st.image(viz_data.get("image_path"))
     else:
-        for submission in submissions:
-            student = get_user_by_id(submission['student_id'])
-            with st.expander(f"Submission by {student['name']} - {submission['submitted_at'].split('T')[0]}"):
-                # Display text content
-                st.write("**Content:**")
-                st.text_area("", submission['content'], height=200, key=f"content_{submission['id']}", disabled=True)
-                
-                # Display file if available
-                if submission.get('file_info'):
-                    st.write("**Attached File:**")
-                    file_info = submission['file_info']
-                    st.markdown(get_file_download_link(file_info['file_path'], file_info['filename']), unsafe_allow_html=True)
-                    st.write(f"File type: {file_info['file_type']}, Size: {file_info['file_size']/1024:.1f} KB")
-                
-                # Display AI feedback if available
-                if submission.get('ai_feedback'):
-                    st.write("**AI-Generated Feedback:**")
-                    st.markdown(submission['ai_feedback'])
-                
-                # AI Auto-grading button
-                col1, col2 = st.columns([1, 3])
-                with col1:
-                    if st.button("Auto-Grade", key=f"auto_grade_{submission['id']}"):
-                        success, message = auto_grade_submission(submission['id'])
-                        if success:
-                            st.success(message)
-                            st.rerun()
-                        else:
-                            st.error(message)
-                
-                # Manual Grading form
-                with st.form(f"grade_submission_{submission['id']}"):
-                    st.write("**Manual Grading:**")
-                    score = st.number_input("Score", min_value=0, max_value=assignment['points'], value=submission.get('score', 0) or 0)
-                    feedback = st.text_area("Feedback", value=submission.get('feedback', ''))
-                    use_ai_grading = st.checkbox("Include AI Feedback")
-                    submit_grade = st.form_submit_button("Submit Grade")
-                    
-                    if submit_grade:
-                        success, message = grade_submission(
-                            submission['id'],
-                            score,
-                            feedback,
-                            use_ai_grading
-                        )
-                        if success:
-                            st.success(message)
-                            st.rerun()
-                        else:
-                            st.error(message)
-        
-                # Add model-based grading option
-                if selected_models:
-                    if st.button("Evaluate with Selected Models", key=f"model_grade_{submission['id']}"):
-                        model_results = {}
-                        progress_bar = st.progress(0)
-                        for i, (model, _) in enumerate(selected_models.items()):
-                            result = analyze_with_gemini(
-                                'text',
-                                None,
-                                submission['content'],
-                                'text/plain',
-                                model=model
-                            )
-                            model_results[model] = result
-                            progress_bar.progress((i + 1) / len(selected_models))
-                        
-                        # Store results and update submission
-                        submission['model_evaluations'] = model_results
-                        st.success("Evaluation complete!")
-                        st.rerun()
-                
-                # Display model evaluations if available
-                if submission.get('model_evaluations'):
-                    st.write("### Model Evaluations")
-                    for model, result in submission.get('model_evaluations').items():
-                        with st.expander(f"Results from {model}"):
-                            st.write(result)
-                
-                # Display AI suggestions if available
-                if submission.get('ai_suggestions'):
-                    show_ai_suggestions(submission['ai_suggestions'])
-
-def show_ai_suggestions(suggestions):
-    """Display AI-generated suggestions"""
-    st.write("### AI Analysis and Suggestions")
+        # Fallback to basic visualization
+        st.write("Skill map visualization not available.")
     
+    # Display proficiency summary
+    st.subheader("Your Proficiency Summary")
+    
+    # Group skills by status
+    skills_by_status = {
+        "mastered": [],
+        "proficient": [],
+        "developing": [],
+        "not_started": [],
+        "recommended": []
+    }
+    
+    # Add all skills to their status group
+    for skill_name, skill in skill_data.items():
+        skills_by_status[skill['status']].append(skill)
+    
+    # Add recommended skills
+    for skill in learning_path.get("recommended_skills", []):
+        if isinstance(skill, dict) and 'name' in skill:
+            # Check if skill is already in our data
+            if skill['name'] not in skill_data:
+                skills_by_status["recommended"].append(skill)
+    
+    # Create columns for different status groups
+    status_labels = {
+        "mastered": "🟢 Mastered", 
+        "proficient": "🟠 Proficient", 
+        "developing": "🟡 Developing", 
+        "not_started": "⚪ Not Started",
+        "recommended": "⭐ Recommended Next"
+    }
+    
+    # Show skills by status
+    for status, label in status_labels.items():
+        if skills_by_status[status]:
+            st.write(f"**{label}**")
+            
+            for skill in skills_by_status[status]:
+                # Calculate width based on proficiency
+                proficiency = skill.get('proficiency', 0)
+                
+                # Create progress bar
+                col1, col2 = st.columns([4, 1])
+                with col1:
+                    st.write(f"{skill['name']}")
+                with col2:
+                    if proficiency > 0:
+                        st.progress(proficiency)
+                        st.caption(f"{proficiency * 100:.0f}%")
+                    else:
+                        st.caption("Not started")
+    
+    # Display resources section
+    st.subheader("Recommended Resources")
+    resources = learning_path.get("resources", [])
+    
+    if not resources:
+        st.info("No specific resources available at this time.")
+    else:
+        # Show resources by skill
+        resources_by_skill = {}
+        for resource in resources:
+            skill = resource.get("skill", "General")
+            if skill not in resources_by_skill:
+                resources_by_skill[skill] = []
+            resources_by_skill[skill].append(resource)
+        
+        # Display resources
+        for skill, skill_resources in resources_by_skill.items():
+            with st.expander(f"Resources for {skill}"):
+                for resource in skill_resources:
+                    st.markdown(f"**[{resource.get('title', 'Resource')}]({resource.get('url', '#')})**")
+                    if "description" in resource:
+                        st.caption(resource.get("description"))
+                    st.caption(f"Type: {resource.get('type', 'Unknown')}")
+    
+    # Next steps section
+    st.subheader("Suggested Next Steps")
+    next_steps = learning_path.get("next_steps", [])
+    
+    if not next_steps:
+        st.info("Complete more assignments to receive personalized next steps.")
+    else:
+        for i, step in enumerate(next_steps):
+            st.markdown(f"**{i+1}. {step.get('title', 'Next step')}**")
+            st.write(step.get("description", ""))
+            
+            # If there are resources for this step, show them
+            if "resources" in step and step["resources"]:
+                with st.expander("Related Resources"):
+                    for resource in step["resources"]:
+                        st.markdown(f"- [{resource.get('title', 'Resource')}]({resource.get('url', '#')})")
+    
+    # Generation time
+    if "generated_at" in learning_path:
+        try:
+            generated_date = datetime.fromisoformat(learning_path["generated_at"]).strftime("%B %d, %Y")
+            st.caption(f"Learning path generated on {generated_date}")
+        except:
+            st.caption("Learning path recently generated")
+
+def translate_feedback(feedback_text, target_language):
+    """
+    Translate feedback to the target language using the multilingual feedback service.
+    
+    Args:
+        feedback_text: The feedback text to translate
+        target_language: The target language code (e.g., 'es', 'fr')
+        
+    Returns:
+        Translated feedback text
+    """
+    try:
+        # Get the translation
+        result = multilingual_feedback_service.translate_feedback(
+            text=feedback_text,
+            target_language=target_language
+        )
+        
+        if result.get("status") == "error":
+            return feedback_text  # Return original text on error
+            
+        return result.get("translated_text", feedback_text)
+    except Exception as e:
+        log_error(f"Error translating feedback: {str(e)}")
+        return feedback_text  # Return original text on error
+
+def get_student_language_preference(student_id):
+    """Get the preferred language for a student"""
+    try:
+        # Get user preferences
+        users = load_data('users')
+        user = next((u for u in users if u['id'] == student_id), None)
+        
+        if user and 'preferences' in user and 'language' in user['preferences']:
+            return user['preferences']['language']
+            
+        # Default to English
+        return 'en'
+    except Exception as e:
+        log_error(f"Error getting language preference: {str(e)}")
+        return 'en'
+
+def set_student_language_preference(student_id, language_code):
+    """Set the preferred language for a student"""
+    try:
+        # Get user data
+        users = load_data('users')
+        
+        # Find user and update preferences
+        for i, user in enumerate(users):
+            if user['id'] == student_id:
+                if 'preferences' not in user:
+                    users[i]['preferences'] = {}
+                
+                users[i]['preferences']['language'] = language_code
+                
+                # Save updated users
+                save_data(users, 'users')
+                
+                # Update multilingual service cache
+                multilingual_feedback_service.set_student_language_preference(student_id, language_code)
+                
+                return True
+                
+        return False
+    except Exception as e:
+        log_error(f"Error setting language preference: {str(e)}")
+        return False
+
+def show_language_settings():
+    """Show language settings for the current user"""
+    student_id = st.session_state.current_user['id']
+    
+    # Get available languages
+    languages = multilingual_feedback_service.get_supported_languages()
+    
+    # Get current preference
+    current_lang = get_student_language_preference(student_id)
+    
+    # Format language options
+    language_options = {}
+    for lang in languages:
+        code = lang.get('code')
+        name = lang.get('name')
+        language_options[code] = f"{name} ({code})"
+    
+    # Show language selector
+    selected_lang = st.selectbox(
+        "Select your preferred language for feedback",
+        options=list(language_options.keys()),
+        format_func=lambda x: language_options[x],
+        index=list(language_options.keys()).index(current_lang) if current_lang in language_options else 0
+    )
+    
+    # Save button
+    if st.button("Save Language Preference"):
+        if set_student_language_preference(student_id, selected_lang):
+            st.success(f"Language preference updated to {language_options[selected_lang]}")
+        else:
+            st.error("Failed to update language preference")
+            
+    # Preview section
+    st.subheader("Translation Preview")
+    
+    sample_feedback = """
+    Great work on your assignment! Your explanation of the problem was clear and well-structured. 
+    However, you could improve the analysis section by adding more supporting evidence.
+    """
+    
+    # Show original and translated version
     col1, col2 = st.columns(2)
     
     with col1:
-        st.write("**Content Analysis:**")
-        st.write(f"- Word count: {suggestions['content_analysis']['length']}")
-        st.write(f"- Sentences: {suggestions['content_analysis']['sentence_count']}")
-        st.write("- Key terms: " + ", ".join(suggestions['content_analysis']['key_terms']))
-    
+        st.write("**Original (English):**")
+        st.write(sample_feedback)
+        
     with col2:
-        st.write("**Sentiment Analysis:**")
-        sentiment = suggestions['content_analysis']['sentiment']
-        st.write(f"- Positive: {sentiment['pos']:.2f}")
-        st.write(f"- Negative: {sentiment['neg']:.2f}")
-        st.write(f"- Neutral: {sentiment['neu']:.2f}")
-    
-    st.write("**Strengths:**")
-    for strength in suggestions['strengths']:
-        st.write(f"✅ {strength}")
-    
-    st.write("**Areas for Improvement:**")
-    for area in suggestions['improvement_areas']:
-        st.write(f"📝 {area}")
-
-def show_home_page():
-    st.title("EduMate - AI-Powered Education Platform")
-    
-    # Hero section
-    st.markdown("<h1 style='text-align: center;'>Welcome to EduMate</h1>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align: center;'>AI-Powered Education Platform</h3>", unsafe_allow_html=True)
-    
-    # Image
-    st.image("https://img.freepik.com/free-vector/online-learning-isometric-concept_1284-17947.jpg", use_container_width=True)
-    
-    # Features section
-    st.markdown("---")
-    st.subheader("Key Features")
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown("### 🤖 AI-Powered Grading")
-        st.write("Save hours of time with automated grading for essays, code assignments, and quizzes.")
-    
-    with col2:
-        st.markdown("### 📊 Insightful Analytics")
-        st.write("Track student progress and identify learning gaps with comprehensive analytics.")
-                        
-                        with col3:
-        st.markdown("### 📝 Personalized Feedback")
-        st.write("Students receive detailed, personalized feedback to improve their learning.")
-    
-    # How it works
-    st.markdown("---")
-    st.subheader("How It Works")
-    
-    tab1, tab2, tab3 = st.tabs(["For Teachers", "For Students", "For Institutions"])
-    
-    with tab1:
-        st.markdown("""
-        1. **Create Classes and Assignments** - Easily set up your courses and create various types of assignments
-        2. **AI Grades Submissions** - Our AI technology automatically grades submissions based on your criteria
-        3. **Review and Provide Feedback** - Review AI-generated grades and add your own feedback
-        4. **Track Progress** - Monitor student performance and identify areas for improvement
-        """)
-    
-    with tab2:
-        st.markdown("""
-        1. **Join Classes** - Enroll in courses using course codes provided by your teachers
-        2. **Complete Assignments** - Submit your work directly through the platform
-        3. **Receive Feedback** - Get detailed feedback to understand your strengths and weaknesses
-        4. **Track Your Progress** - Monitor your performance across all your courses
-        """)
-    
-    with tab3:
-        st.markdown("""
-        1. **Streamline Administration** - Simplify course management and grading processes
-        2. **Improve Learning Outcomes** - Enhance student performance with personalized feedback
-        3. **Save Teacher Time** - Reduce grading workload by up to 70%
-        4. **Data-Driven Insights** - Make informed decisions based on comprehensive analytics
-        """)
-
-# Create demo data if no users exist
-users = load_data('users')
-if not users:
-    # Create demo teacher
-    register_user('teacher@edumate.com', 'teacher123', 'Demo Teacher', 'teacher')
-    
-    # Create demo student
-    register_user('student@edumate.com', 'student123', 'Demo Student', 'student')
-    
-    # Create demo course
-    create_course(
-        'Introduction to Computer Science',
-        'CS101',
-        'An introductory course covering the basics of computer science and programming.',
-        1,  # Teacher ID
-        (datetime.now() - timedelta(days=30)).isoformat(),
-        (datetime.now() + timedelta(days=60)).isoformat()
-    )
-    
-    # Enroll demo student
-    enroll_student(1, 2)  # Course ID 1, Student ID 2
-    
-    # Create demo assignment
-    create_assignment(
-        'Python Basics',
-        'Write a Python program that calculates the factorial of a number.',
-        1,  # Course ID
-        1,  # Teacher ID
-        (datetime.now() + timedelta(days=7)).isoformat()
-    )
-
-# Main app logic
-def main():
-    # Sidebar
-    with st.sidebar:
-        st.image("https://img.icons8.com/color/96/000000/graduation-cap.png", width=50)
-        st.title("EduMate")
-        
-        # API Key Status
-        st.subheader("API Key Status")
-        status, message = check_api_key_status()
-        st.write(f"Gemini API: {status}")
-        st.caption(message)
-        st.divider()
-        
-        if st.session_state.logged_in:
-            st.write(f"Logged in as: {st.session_state.current_user['name']}")
-            st.write(f"Role: {st.session_state.current_user['role'].capitalize()}")
-            
-            st.markdown("---")
-            
-            # Navigation
-            st.button("Dashboard", key="sidebar_dashboard_btn", on_click=set_page, args=('dashboard',), use_container_width=True)
-            
-            # Logout button
-            if st.button("Logout", key="sidebar_logout_btn", use_container_width=True):
-                st.session_state.logged_in = False
-                st.session_state.current_user = None
-                st.session_state.current_page = 'home'
-                st.rerun()
+        # Only show translation if language is not English
+        if selected_lang != 'en':
+            st.write(f"**Translated ({language_options[selected_lang]}):**")
+            translated = translate_feedback(sample_feedback, selected_lang)
+            st.write(translated)
         else:
-            st.button("Home", key="sidebar_home_btn", on_click=set_page, args=('home',), use_container_width=True)
-            st.button("Login", key="sidebar_login_btn", on_click=set_page, args=('login',), use_container_width=True)
-            st.button("Register", key="sidebar_register_btn", on_click=set_page, args=('register',), use_container_width=True)
-    
-    # Main content
-    if st.session_state.current_page == 'home':
-        show_home_page()
-    elif st.session_state.current_page == 'login':
-        show_login_page()
-    elif st.session_state.current_page == 'register':
-        show_register_page()
-    elif st.session_state.current_page == 'dashboard':
-        if st.session_state.logged_in:
-            show_dashboard()
-        else:
-            st.session_state.current_page = 'login'
-            st.rerun()
-    elif st.session_state.current_page == 'course_detail':
-        if st.session_state.logged_in and hasattr(st.session_state, 'current_course'):
-            show_course_detail()
-        else:
-            st.session_state.current_page = 'dashboard'
-            st.rerun()
-    elif st.session_state.current_page == 'assignment_submissions':
-        if st.session_state.logged_in and hasattr(st.session_state, 'current_assignment'):
-            show_assignment_submissions()
-        else:
-            st.session_state.current_page = 'dashboard'
-            st.rerun()
-
-def show_exam_information():
-    """Display exam information and preparation resources."""
-    st.header("Exam Information")
-    
-    # Get available exams from exam manager
-    exams = exam_manager.get_available_exams()
-    
-    if not exams:
-        st.info("No exam information available at this time.")
-        return
-    
-    # Create exam categories
-    exam_categories = {}
-    for exam in exams:
-        category = exam.get('category', 'Other')
-        if category not in exam_categories:
-            exam_categories[category] = []
-        exam_categories[category].append(exam)
-    
-    # Display exams by category
-    for category, category_exams in exam_categories.items():
-        st.subheader(category)
-        
-        for exam in category_exams:
-            with st.expander(exam.get('name', 'Unknown Exam')):
-                st.write(f"**Full Name:** {exam.get('full_name', 'N/A')}")
-                st.write(f"**Description:** {exam.get('description', 'No description available.')}")
-                
-                # Display dates if available
-                if exam.get('dates'):
-                    st.write("**Important Dates:**")
-                    for date_item in exam.get('dates', []):
-                        st.write(f"- {date_item.get('event')}: {date_item.get('date')}")
-                
-                # Display eligibility criteria
-                if exam.get('eligibility'):
-                    st.write("**Eligibility Criteria:**")
-                    for criteria in exam.get('eligibility', []):
-                        st.write(f"- {criteria}")
-                
-                # Display exam pattern
-                if exam.get('pattern'):
-                    st.write("**Exam Pattern:**")
-                    for section in exam.get('pattern', []):
-                        st.write(f"- {section}")
-                
-                # Display preparation resources
-                if exam.get('resources'):
-                    st.write("**Preparation Resources:**")
-                    for resource in exam.get('resources', []):
-                        if resource.get('url'):
-                            st.markdown(f"- [{resource.get('name')}]({resource.get('url')})")
-                        else:
-                            st.write(f"- {resource.get('name')}")
-                
-                # Display official website
-                if exam.get('website'):
-                    st.write(f"**Official Website:** [{exam.get('website')}]({exam.get('website')})")
-                
-                # Exam preparation button
-                if st.button("Prepare for this Exam", key=f"prepare_{exam.get('id', '0')}"):
-                    st.session_state.selected_exam = exam.get('id')
-                    st.rerun()
-
-def show_indian_education_options():
-    """Display information about the Indian education system."""
-    st.header("Indian Education System")
-    
-    # Get education system information from the utility
-    education_paths = indian_education.get_education_paths()
-    
-    if not education_paths:
-        st.info("Education system information is not available at this time.")
-        return
-    
-    # Create tabs for different education levels
-    education_levels = ["School Education", "Higher Education", "Professional Courses", "Entrance Exams"]
-    tabs = st.tabs(education_levels)
-    
-    # School Education tab
-    with tabs[0]:
-        st.subheader("School Education in India")
-        
-        # Display school education structure
-        school_structure = education_paths.get('school_education', {})
-        
-        if school_structure:
-            for level, details in school_structure.items():
-                with st.expander(level):
-                    st.write(details.get('description', 'No description available'))
-                    
-                    if details.get('age_range'):
-                        st.write(f"**Age Range:** {details.get('age_range')}")
-                    
-                    if details.get('curriculum_options'):
-                        st.write("**Curriculum Options:**")
-                        for curriculum in details.get('curriculum_options', []):
-                            st.write(f"- {curriculum}")
-    
-    # Higher Education tab
-    with tabs[1]:
-        st.subheader("Higher Education in India")
-        
-        # Display higher education options
-        higher_education = education_paths.get('higher_education', {})
-        
-        if higher_education:
-            for degree_type, details in higher_education.items():
-                with st.expander(degree_type):
-                    st.write(details.get('description', 'No description available'))
-                    
-                    if details.get('duration'):
-                        st.write(f"**Duration:** {details.get('duration')}")
-                    
-                    if details.get('fields'):
-                        st.write("**Popular Fields:**")
-                        for field in details.get('fields', []):
-                            st.write(f"- {field}")
-    
-    # Professional Courses tab
-    with tabs[2]:
-        st.subheader("Professional Courses")
-        
-        # Display professional course options
-        professional_courses = education_paths.get('professional_courses', [])
-        
-        if professional_courses:
-            for course in professional_courses:
-                with st.expander(course.get('name', 'Unknown Course')):
-                    st.write(course.get('description', 'No description available'))
-                    
-                    if course.get('duration'):
-                        st.write(f"**Duration:** {course.get('duration')}")
-                    
-                    if course.get('eligibility'):
-                        st.write(f"**Eligibility:** {course.get('eligibility')}")
-                    
-                    if course.get('career_prospects'):
-                        st.write("**Career Prospects:**")
-                        for prospect in course.get('career_prospects', []):
-                            st.write(f"- {prospect}")
-    
-    # Entrance Exams tab
-    with tabs[3]:
-        st.subheader("Important Entrance Exams")
-        
-        # Display entrance exam information
-        entrance_exams = education_paths.get('entrance_exams', [])
-        
-        if entrance_exams:
-            # Create a DataFrame for better display
-            exam_data = []
+            st.write("**Translated:**")
+            st.write("Same as original (English)")
             
-            for exam in entrance_exams:
-                # Make sure exam is a dictionary before using .get()
-                if isinstance(exam, dict):
-                    exam_data.append({
-                        "Exam": exam.get('name', 'Unknown'),
-                        "Type": exam.get('type', 'N/A'),
-                        "Level": exam.get('level', 'N/A'),
-                        "Frequency": exam.get('frequency', 'N/A')
-                    })
-                else:
-                    # If exam is a string, create a simple entry
-                    exam_data.append({
-                        "Exam": exam,
-                        "Type": "N/A",
-                        "Level": "N/A",
-                        "Frequency": "N/A"
-                    })
-            
-            # Display as a table
-            if exam_data:
-                st.dataframe(pd.DataFrame(exam_data))
-            
-            # Detailed exam information
-            for exam in entrance_exams:
-                if isinstance(exam, dict):
-                    with st.expander(exam.get('name', 'Unknown Exam')):
-                        st.write(exam.get('description', 'No description available'))
-                        
-                        if exam.get('eligibility'):
-                            st.write(f"**Eligibility:** {exam.get('eligibility')}")
-                        
-                        if exam.get('pattern'):
-                            st.write(f"**Exam Pattern:** {exam.get('pattern')}")
-                        
-                        if exam.get('preparation_tips'):
-                            st.write("**Preparation Tips:**")
-                            for tip in exam.get('preparation_tips', []):
-                                st.write(f"- {tip}")
-                        
-                        if exam.get('website'):
-                            st.markdown(f"**[Official Website]({exam.get('website')})**")
+    # Show note about translation
+    st.caption("Note: All your feedback will be automatically translated to your preferred language.")
 
-# Add the new function for test creation
-def show_test_creator():
-    """Display the test creation interface for teachers."""
-    st.header("Create Test")
+def show_teacher_analytics():
+    """Display the enhanced Teacher Analytics Dashboard using the TeacherAnalyticsService."""
+    st.title("Teacher Analytics Dashboard")
     
-    # Get teacher's courses for selection
+    # Get teacher's courses
     teacher_id = st.session_state.current_user['id']
     courses = get_teacher_courses(teacher_id)
     
     if not courses:
-        st.info("You need to create a course first before creating tests.")
+        st.info("You haven't created any courses yet. Create a course to access analytics.")
         return
     
-    # Course selection
+    # Select course to analyze
     selected_course = st.selectbox(
         "Select Course",
         options=courses,
-        format_func=lambda x: f"{x['name']} ({x['code']})",
-        key="test_creator_course_select"  # Add unique key here
+        format_func=lambda x: f"{x['name']} ({x['code']})"
     )
     
-    # Test creation form
-    with st.form("create_test_form"):
-        test_title = st.text_input("Test Title")
-        test_description = st.text_area("Test Description")
+    if not selected_course:
+        st.warning("Please select a course to analyze.")
+        return
+    
+    # Create dashboard options with tabs
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "Class Dashboard", 
+        "Student Comparison", 
+        "Longitudinal Analysis",
+        "AI Insights"
+    ])
+    
+    # Get assignments and submissions for the selected course
+    assignments = get_course_assignments(selected_course['id'])
+    
+    # Get all submissions for all assignments in this course
+    all_submissions = []
+    for assignment in assignments:
+        assignment_submissions = get_assignment_submissions(assignment['id'])
+        for submission in assignment_submissions:
+            # Add assignment info to submission for easier access
+            submission['assignment_info'] = assignment
+            all_submissions.append(submission)
+    
+    # Get student data
+    students = []
+    for student_id in selected_course.get('students', []):
+        student = get_user_by_id(student_id)
+        if student:
+            students.append(student)
+    
+    with tab1:
+        st.header("Class Dashboard")
         
-        # Test settings
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            total_points = st.number_input("Total Points", min_value=10, max_value=500, value=100, step=10)
-        with col2:
-            due_date = st.date_input("Due Date")
-        with col3:
-            time_limit = st.number_input("Time Limit (minutes)", min_value=5, max_value=180, value=60, step=5)
+        # Use TeacherAnalyticsService to generate class dashboard
+        dashboard_data = teacher_analytics_service.generate_class_dashboard(
+            course_id=selected_course['id'],
+            teacher_id=teacher_id,
+            assignments=assignments,
+            submissions=all_submissions,
+            students=students
+        )
         
-        # Test type selection
-        test_type = st.radio("Test Type", ["Multiple Choice", "Essay", "Mixed"])
-        
-        # Question section
-        st.subheader("Questions")
-        
-        # Initialize questions in session state if not present
-        if 'test_questions' not in st.session_state:
-            st.session_state.test_questions = []
-        
-        # Add question button
-        add_question = st.checkbox("Add Question")
-        
-        if add_question:
-            question_type = st.selectbox("Question Type", ["Multiple Choice", "True/False", "Short Answer", "Essay"])
-            question_text = st.text_area("Question Text")
-            question_points = st.number_input("Points", min_value=1, max=100, value=10)
+        if dashboard_data:
+            # Display overall class metrics
+            st.subheader("Class Performance Overview")
             
-            # Different inputs based on question type
-            if question_type == "Multiple Choice":
-                options = []
-                for i in range(4):
-                    option = st.text_input(f"Option {i+1}", key=f"option_{i}")
-                    options.append(option)
-                
-                correct_answer = st.selectbox("Correct Answer", options, format_func=lambda x: x if x else "Select correct answer")
-                
-                if st.button("Add This Question"):
-                    if question_text and correct_answer and all(options):
-                        new_question = {
-                            'id': len(st.session_state.test_questions) + 1,
-                            'type': question_type,
-                            'text': question_text,
-                            'points': question_points,
-                            'options': options,
-                            'correct_answer': correct_answer
-                        }
-                        st.session_state.test_questions.append(new_question)
-                        st.success("Question added!")
-                        st.rerun()
-                    else:
-                        st.error("Please fill in all fields.")
+            metrics = dashboard_data.get('class_metrics', {})
+            col1, col2, col3, col4 = st.columns(4)
             
-            elif question_type == "True/False":
-                correct_answer = st.radio("Correct Answer", ["True", "False"])
-                
-                if st.button("Add This Question"):
-                    if question_text:
-                        new_question = {
-                            'id': len(st.session_state.test_questions) + 1,
-                            'type': question_type,
-                            'text': question_text,
-                            'points': question_points,
-                            'options': ["True", "False"],
-                            'correct_answer': correct_answer
-                        }
-                        st.session_state.test_questions.append(new_question)
-                        st.success("Question added!")
-                        st.rerun()
-                    else:
-                        st.error("Please enter a question.")
+            with col1:
+                avg_score = metrics.get('average_score', 0)
+                st.metric("Average Score", f"{avg_score:.1f}%")
             
-            elif question_type == "Short Answer":
-                correct_answer = st.text_input("Correct Answer")
-                
-                if st.button("Add This Question"):
-                    if question_text and correct_answer:
-                        new_question = {
-                            'id': len(st.session_state.test_questions) + 1,
-                            'type': question_type,
-                            'text': question_text,
-                            'points': question_points,
-                            'correct_answer': correct_answer
-                        }
-                        st.session_state.test_questions.append(new_question)
-                        st.success("Question added!")
-                        st.rerun()
-                    else:
-                        st.error("Please fill in all fields.")
+            with col2:
+                completion_rate = metrics.get('completion_rate', 0) * 100
+                st.metric("Completion Rate", f"{completion_rate:.1f}%")
             
-            elif question_type == "Essay":
-                word_limit = st.number_input("Word Limit", min_value=50, max_value=2000, value=500, step=50)
+            with col3:
+                at_risk_count = metrics.get('at_risk_students', 0)
+                st.metric("At-Risk Students", at_risk_count)
+            
+            with col4:
+                on_track_count = metrics.get('on_track_students', 0)
+                st.metric("On-Track Students", on_track_count)
+            
+            # Display grade distribution
+            st.subheader("Grade Distribution")
+            
+            grade_distribution = dashboard_data.get('grade_distribution', [])
+            if grade_distribution:
+                # Create a DataFrame for the histogram
+                grades = [entry.get('score', 0) for entry in grade_distribution]
                 
-                if st.button("Add This Question"):
-                    if question_text:
-                        new_question = {
-                            'id': len(st.session_state.test_questions) + 1,
-                            'type': question_type,
-                            'text': question_text,
-                            'points': question_points,
-                            'word_limit': word_limit
-                        }
-                        st.session_state.test_questions.append(new_question)
-                        st.success("Question added!")
-                        st.rerun()
-                    else:
-                        st.error("Please enter a question.")
-        
-        # Display added questions
-        if st.session_state.test_questions:
-            st.subheader("Added Questions")
-            for i, question in enumerate(st.session_state.test_questions):
-                with st.expander(f"Question {i+1}: {question['text'][:50]}... ({question['points']} pts)"):
-                    st.write(f"**Type:** {question['type']}")
-                    st.write(f"**Question:** {question['text']}")
-                    st.write(f"**Points:** {question['points']}")
+                if grades:
+                    # Plot histogram
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    ax.hist(grades, bins=10, range=(0, 100))
+                    ax.set_xlabel('Score (%)')
+                    ax.set_ylabel('Number of Students')
+                    ax.set_title('Grade Distribution')
                     
-                    if question['type'] == "Multiple Choice":
-                        st.write("**Options:**")
-                        for j, option in enumerate(question['options']):
-                            if option == question['correct_answer']:
-                                st.write(f"- {option} ✓")
-                            else:
-                                st.write(f"- {option}")
+                    # Add vertical lines for grade boundaries
+                    ax.axvline(x=90, color='green', linestyle='--', label='A (90%)')
+                    ax.axvline(x=80, color='lightgreen', linestyle='--', label='B (80%)')
+                    ax.axvline(x=70, color='yellow', linestyle='--', label='C (70%)')
+                    ax.axvline(x=60, color='orange', linestyle='--', label='D (60%)')
+                    ax.axvline(x=50, color='red', linestyle='--', label='F (50%)')
+                    ax.legend()
                     
-                    elif question['type'] == "True/False":
-                        st.write(f"**Correct Answer:** {question['correct_answer']}")
-                    
-                    elif question['type'] == "Short Answer":
-                        st.write(f"**Correct Answer:** {question['correct_answer']}")
-                    
-                    elif question['type'] == "Essay":
-                        st.write(f"**Word Limit:** {question['word_limit']}")
-                    
-                    # Delete question button
-                    if st.button("Delete Question", key=f"delete_q_{i}"):
-                        st.session_state.test_questions.pop(i)
-                        st.success("Question deleted!")
-                        st.rerun()
+                    st.pyplot(fig)
             
-        # AI assistance for test creation
-        st.subheader("AI Test Generation")
-        use_ai = st.checkbox("Use AI to generate questions")
-        
-        if use_ai:
-            ai_topic = st.text_input("Topic")
-            ai_difficulty = st.select_slider("Difficulty", options=["Easy", "Medium", "Hard"])
-            ai_num_questions = st.number_input("Number of Questions", min_value=1, max_value=20, value=5)
-            ai_question_types = st.multiselect("Question Types", 
-                                              ["Multiple Choice", "True/False", "Short Answer", "Essay"],
-                                              default=["Multiple Choice", "True/False"])
+            # Display assignment completion rates
+            st.subheader("Assignment Completion Rates")
             
-            if st.button("Generate Questions with AI"):
-                if ai_topic:
-                    with st.spinner("Generating questions with AI..."):
-                        # Call the AI service to generate questions
-                        try:
-                            # Simulate AI generation (in a real app, this would call an AI service)
-                            import time
-                            import random
-                            
-                            # Simulate processing time
-                            time.sleep(2)
-                            
-                            # Generate sample questions based on the topic
-                            for i in range(ai_num_questions):
-                                q_type = random.choice(ai_question_types)
-                                
-                                if q_type == "Multiple Choice":
-                                    new_question = {
-                                        'id': len(st.session_state.test_questions) + 1,
-                                        'type': q_type,
-                                        'text': f"AI-generated question about {ai_topic} (Difficulty: {ai_difficulty})",
-                                        'points': random.randint(5, 15),
-                                        'options': [f"Option A about {ai_topic}", 
-                                                   f"Option B about {ai_topic}", 
-                                                   f"Option C about {ai_topic}", 
-                                                   f"Option D about {ai_topic}"],
-                                        'correct_answer': f"Option A about {ai_topic}"
-                                    }
-                                
-                                elif q_type == "True/False":
-                                    new_question = {
-                                        'id': len(st.session_state.test_questions) + 1,
-                                        'type': q_type,
-                                        'text': f"AI-generated True/False question about {ai_topic} (Difficulty: {ai_difficulty})",
-                                        'points': random.randint(5, 10),
-                                        'options': ["True", "False"],
-                                        'correct_answer': random.choice(["True", "False"])
-                                    }
-                                
-                                elif q_type == "Short Answer":
-                                    new_question = {
-                                        'id': len(st.session_state.test_questions) + 1,
-                                        'type': q_type,
-                                        'text': f"AI-generated short answer question about {ai_topic} (Difficulty: {ai_difficulty})",
-                                        'points': random.randint(10, 20),
-                                        'correct_answer': f"Sample answer about {ai_topic}"
-                                    }
-                                
-                                else:  # Essay
-                                    new_question = {
-                                        'id': len(st.session_state.test_questions) + 1,
-                                        'type': q_type,
-                                        'text': f"AI-generated essay question about {ai_topic} (Difficulty: {ai_difficulty})",
-                                        'points': random.randint(20, 50),
-                                        'word_limit': random.choice([500, 750, 1000])
-                                    }
-                                
-                                st.session_state.test_questions.append(new_question)
-                            
-                            st.success(f"Generated {ai_num_questions} questions!")
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"Error generating questions: {str(e)}")
-                else:
-                    st.error("Please enter a topic for AI question generation.")
+            assignment_data = dashboard_data.get('assignment_metrics', [])
+            if assignment_data:
+                # Create DataFrame
+                assignment_df = pd.DataFrame(assignment_data)
+                if not assignment_df.empty and 'title' in assignment_df.columns and 'completion_rate' in assignment_df.columns:
+                    assignment_df['completion_rate'] = assignment_df['completion_rate'] * 100  # Convert to percentage
+                    
+                    # Sort by due date if available
+                    if 'due_date' in assignment_df.columns:
+                        assignment_df = assignment_df.sort_values('due_date')
+                    
+                    # Plot
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    ax.bar(assignment_df['title'], assignment_df['completion_rate'], color='skyblue')
+                    ax.set_xlabel('Assignment')
+                    ax.set_ylabel('Completion Rate (%)')
+                    ax.set_ylim(0, 100)
+                    plt.xticks(rotation=45, ha='right')
+                    plt.tight_layout()
+                    
+                    st.pyplot(fig)
+            
+            # Display skill gap analysis
+            st.subheader("Skill Gap Analysis")
+            
+            skill_data = dashboard_data.get('skill_gaps', [])
+            if skill_data:
+                # Create DataFrame
+                skill_df = pd.DataFrame(skill_data)
+                if not skill_df.empty and 'skill' in skill_df.columns and 'proficiency' in skill_df.columns:
+                    skill_df['proficiency'] = skill_df['proficiency'] * 100  # Convert to percentage
+                    
+                    # Sort by proficiency (ascending to show gaps first)
+                    skill_df = skill_df.sort_values('proficiency')
+                    
+                    # Plot
+                    fig, ax = plt.subplots(figsize=(10, 5))
+                    bars = ax.barh(skill_df['skill'], skill_df['proficiency'], color='skyblue')
+                    
+                    # Color bars based on proficiency
+                    for i, bar in enumerate(bars):
+                        proficiency = skill_df['proficiency'].iloc[i]
+                        if proficiency < 60:
+                            bar.set_color('salmon')
+                        elif proficiency < 80:
+                            bar.set_color('khaki')
+                        else:
+                            bar.set_color('lightgreen')
+                    
+                    ax.set_xlabel('Proficiency (%)')
+                    ax.set_xlim(0, 100)
+                    
+                    # Add vertical lines for proficiency levels
+                    ax.axvline(x=80, color='green', linestyle='--', label='Mastery (80%)')
+                    ax.axvline(x=60, color='orange', linestyle='--', label='Proficient (60%)')
+                    ax.legend()
+                    
+                    st.pyplot(fig)
+                    
+                    # Display suggestions for addressing skill gaps
+                    if 'gap_suggestions' in dashboard_data:
+                        st.subheader("Suggested Interventions")
+                        for suggestion in dashboard_data['gap_suggestions']:
+                            st.write(f"- {suggestion}")
+        else:
+            st.warning("Unable to generate class dashboard. Ensure students are enrolled and have submitted assignments.")
+    
+    with tab2:
+        st.header("Student Comparison")
         
-        # Submit button for the entire form
-        submit_test = st.form_submit_button("Create Test")
-        
-        if submit_test:
-            if not test_title:
-                st.error("Test title is required.")
-            elif not st.session_state.test_questions:
-                st.error("Please add at least one question to the test.")
-            else:
-                # Create the test as an assignment
-                test_data = {
-                    'title': test_title,
-                    'description': test_description,
-                    'course_id': selected_course['id'],
-                    'teacher_id': teacher_id,
-                    'type': 'test',
-                    'points': total_points,
-                    'due_date': due_date.isoformat(),
-                    'time_limit': time_limit,
-                    'questions': st.session_state.test_questions
-                }
-                
-                # Save the test
-                assignments = load_data('assignments')
-                test_data['id'] = len(assignments) + 1
-                test_data['created_at'] = datetime.now().isoformat()
-                assignments.append(test_data)
-                save_data(assignments, 'assignments')
-                
-                # Log the action
-                log_audit(
-                    teacher_id,
-                    'create',
-                    'test',
-                    test_data['id'],
-                    True,
-                    f"Created test: {test_title}"
+        if not students:
+            st.info("No students enrolled in this course yet.")
+        else:
+            # Allow comparing specific students
+            selected_students = st.multiselect(
+                "Select Students to Compare",
+                options=[s['id'] for s in students],
+                format_func=lambda x: next((s['name'] for s in students if s['id'] == x), str(x)),
+                default=[s['id'] for s in students[:min(5, len(students))]]  # Default to first 5 students
+            )
+            
+            if selected_students:
+                # Use TeacherAnalyticsService to compare students
+                comparison_data = teacher_analytics_service.compare_students(
+                    course_id=selected_course['id'],
+                    student_ids=selected_students,
+                    assignments=assignments,
+                    submissions=all_submissions
                 )
                 
-                # Clear the questions
-                st.session_state.test_questions = []
+                if comparison_data:
+                    # Display overall performance comparison
+                    st.subheader("Performance Comparison")
+                    
+                    student_metrics = comparison_data.get('student_metrics', [])
+                    if student_metrics:
+                        # Create DataFrame for comparison
+                        metrics_df = pd.DataFrame(student_metrics)
+                        
+                        # Replace student IDs with names
+                        metrics_df['student_name'] = metrics_df['student_id'].apply(
+                            lambda x: next((s['name'] for s in students if s['id'] == x), str(x))
+                        )
+                        
+                        # Transform to percentage where needed
+                        if 'average_score' in metrics_df.columns:
+                            metrics_df['average_score'] = metrics_df['average_score'].apply(lambda x: x * 100 if x <= 1 else x)
+                        
+                        if 'completion_rate' in metrics_df.columns:
+                            metrics_df['completion_rate'] = metrics_df['completion_rate'].apply(lambda x: x * 100 if x <= 1 else x)
+                        
+                        # Create comparison chart
+                        st.subheader("Average Scores")
+                        fig, ax = plt.subplots(figsize=(10, 5))
+                        ax.bar(metrics_df['student_name'], metrics_df['average_score'], color='skyblue')
+                        ax.set_ylabel('Average Score (%)')
+                        ax.set_ylim(0, 100)
+                        plt.xticks(rotation=45, ha='right')
+                        plt.tight_layout()
+                        
+                        st.pyplot(fig)
+                        
+                        # Display a data table with comparison metrics
+                        display_cols = ['student_name', 'average_score', 'completion_rate', 'submissions_count']
+                        renamed_cols = {
+                            'student_name': 'Student',
+                            'average_score': 'Average Score (%)',
+                            'completion_rate': 'Completion Rate (%)',
+                            'submissions_count': 'Submissions Count'
+                        }
+                        
+                        # Filter and rename columns
+                        display_df = metrics_df[display_cols].rename(columns=renamed_cols)
+                        st.dataframe(display_df)
+                    
+                    # Display skill comparison
+                    st.subheader("Skill Comparison")
+                    
+                    skills_data = comparison_data.get('skill_comparison', [])
+                    if skills_data:
+                        # Prepare data for radar chart
+                        student_skills = {}
+                        all_skills = set()
+                        
+                        for entry in skills_data:
+                            student_id = entry.get('student_id')
+                            student_name = next((s['name'] for s in students if s['id'] == student_id), str(student_id))
+                            
+                            if student_name not in student_skills:
+                                student_skills[student_name] = {}
+                            
+                            # Add skills and proficiency
+                            skills = entry.get('skills', [])
+                            for skill in skills:
+                                skill_name = skill.get('name')
+                                if skill_name:
+                                    all_skills.add(skill_name)
+                                    # Convert to percentage if needed
+                                    proficiency = skill.get('proficiency', 0)
+                                    if proficiency <= 1:
+                                        proficiency *= 100
+                                    student_skills[student_name][skill_name] = proficiency
+                        
+                        if student_skills and all_skills:
+                            # Create radar chart for skill comparison
+                            all_skills = sorted(list(all_skills))
+                            
+                            # Prepare data for radar chart
+                            fig = plt.figure(figsize=(10, 10))
+                            ax = fig.add_subplot(111, polar=True)
+                            
+                            # Set angles for each skill
+                            angles = np.linspace(0, 2*np.pi, len(all_skills), endpoint=False).tolist()
+                            angles += angles[:1]  # Close the loop
+                            
+                            # Plot each student
+                            for student_name, skills in student_skills.items():
+                                values = [skills.get(skill, 0) for skill in all_skills]
+                                values += values[:1]  # Close the loop
+                                
+                                ax.plot(angles, values, linewidth=2, label=student_name)
+                                ax.fill(angles, values, alpha=0.1)
+                            
+                            # Set chart properties
+                            ax.set_xticks(angles[:-1])
+                            ax.set_xticklabels(all_skills)
+                            ax.set_yticks([0, 25, 50, 75, 100])
+                            ax.set_yticklabels(['0%', '25%', '50%', '75%', '100%'])
+                            ax.set_ylim(0, 100)
+                            
+                            plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+                            plt.tight_layout()
+                            
+                            st.pyplot(fig)
+                            
+                            # Display a data table with skill proficiency
+                            st.subheader("Skill Proficiency Comparison")
+                            
+                            # Create a DataFrame with skill proficiency for each student
+                            skill_df_data = []
+                            for skill_name in all_skills:
+                                row_data = {'Skill': skill_name}
+                                for student_name, skills in student_skills.items():
+                                    row_data[student_name] = f"{skills.get(skill_name, 0):.1f}%"
+                                skill_df_data.append(row_data)
+                            
+                            if skill_df_data:
+                                skill_df = pd.DataFrame(skill_df_data)
+                                st.dataframe(skill_df)
+                else:
+                    st.warning("Unable to generate student comparison. Please ensure selected students have submitted assignments.")
+            else:
+                st.info("Please select at least one student to compare.")
+    
+    with tab3:
+        st.header("Longitudinal Analysis")
+        
+        # Use TeacherAnalyticsService to generate longitudinal analysis
+        longitudinal_data = teacher_analytics_service.generate_longitudinal_analysis(
+            course_id=selected_course['id'],
+            assignments=assignments,
+            submissions=all_submissions,
+            time_periods=5  # Divide the course into 5 time periods
+        )
+        
+        if longitudinal_data:
+            # Display overall progression
+            st.subheader("Class Performance Over Time")
+            
+            time_series = longitudinal_data.get('time_series', [])
+            if time_series:
+                # Create DataFrame for time series
+                time_df = pd.DataFrame(time_series)
                 
-                st.success(f"Test '{test_title}' created successfully!")
+                # Ensure period and average_score columns exist
+                if 'period' in time_df.columns and 'average_score' in time_df.columns:
+                    # Convert to percentage if needed
+                    time_df['average_score'] = time_df['average_score'].apply(lambda x: x * 100 if x <= 1 else x)
+                    
+                    # Add completion rate as a percentage
+                    if 'completion_rate' in time_df.columns:
+                        time_df['completion_rate'] = time_df['completion_rate'].apply(lambda x: x * 100 if x <= 1 else x)
+                    
+                    # Create line chart
+                    fig, ax1 = plt.subplots(figsize=(10, 5))
+                    
+                    # Plot average score
+                    color = 'tab:blue'
+                    ax1.set_xlabel('Time Period')
+                    ax1.set_ylabel('Average Score (%)', color=color)
+                    ax1.plot(time_df['period'], time_df['average_score'], marker='o', color=color)
+                    ax1.tick_params(axis='y', labelcolor=color)
+                    ax1.set_ylim(0, 100)
+                    
+                    # Add completion rate on secondary y-axis if available
+                    if 'completion_rate' in time_df.columns:
+                        ax2 = ax1.twinx()
+                        color = 'tab:red'
+                        ax2.set_ylabel('Completion Rate (%)', color=color)
+                        ax2.plot(time_df['period'], time_df['completion_rate'], marker='s', color=color, linestyle='--')
+                        ax2.tick_params(axis='y', labelcolor=color)
+                        ax2.set_ylim(0, 100)
+                    
+                    fig.tight_layout()
+                    st.pyplot(fig)
+                    
+                    # Display the data in a table
+                    st.dataframe(time_df.rename(columns={
+                        'period': 'Time Period',
+                        'average_score': 'Average Score (%)',
+                        'completion_rate': 'Completion Rate (%)',
+                        'submissions_count': 'Submissions Count'
+                    }))
+            
+            # Display skill development over time
+            st.subheader("Skill Development Over Time")
+            
+            skill_development = longitudinal_data.get('skill_development', [])
+            if skill_development:
+                # Get unique skills
+                all_skills = set()
+                for period_data in skill_development:
+                    skills = period_data.get('skills', [])
+                    for skill in skills:
+                        all_skills.add(skill.get('name'))
+                
+                all_skills = sorted(list(all_skills))
+                if all_skills:
+                    # Create DataFrames for each skill's development
+                    skill_dfs = {}
+                    for skill_name in all_skills:
+                        skill_data = []
+                        for period_data in skill_development:
+                            period = period_data.get('period')
+                            skills = period_data.get('skills', [])
+                            
+                            # Find the specific skill
+                            skill_entry = next((s for s in skills if s.get('name') == skill_name), None)
+                            
+                            if skill_entry:
+                                # Convert to percentage if needed
+                                proficiency = skill_entry.get('proficiency', 0)
+                                if proficiency <= 1:
+                                    proficiency *= 100
+                                
+                                skill_data.append({
+                                    'period': period,
+                                    'proficiency': proficiency
+                                })
+                        
+                        if skill_data:
+                            skill_dfs[skill_name] = pd.DataFrame(skill_data)
+                    
+                    # Create multi-line chart for skill development
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    
+                    for skill_name, df in skill_dfs.items():
+                        if 'period' in df.columns and 'proficiency' in df.columns and not df.empty:
+                            ax.plot(df['period'], df['proficiency'], marker='o', label=skill_name)
+                    
+                    ax.set_xlabel('Time Period')
+                    ax.set_ylabel('Proficiency (%)')
+                    ax.set_ylim(0, 100)
+                    ax.legend(title='Skills')
+                    
+                    plt.tight_layout()
+                    st.pyplot(fig)
+            
+            # Display most improved and struggling areas
+            if 'trends' in longitudinal_data:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.subheader("Most Improved Areas")
+                    improved_areas = longitudinal_data['trends'].get('improved_areas', [])
+                    for area in improved_areas:
+                        st.success(f"**{area.get('name', '')}:** {area.get('improvement', 0):.1f}% improvement")
+                
+                with col2:
+                    st.subheader("Struggling Areas")
+                    struggling_areas = longitudinal_data['trends'].get('struggling_areas', [])
+                    for area in struggling_areas:
+                        st.error(f"**{area.get('name', '')}:** {area.get('decline', 0):.1f}% decline")
+        else:
+            st.warning("Unable to generate longitudinal analysis. Please ensure sufficient data is available over time.")
+    
+    with tab4:
+        st.header("AI Insights")
+        
+        # Use TeacherAnalyticsService to generate AI insights
+        ai_insights = teacher_analytics_service.generate_ai_insights(
+            course_id=selected_course['id'],
+            teacher_id=teacher_id,
+            assignments=assignments,
+            submissions=all_submissions,
+            students=students
+        )
+        
+        if ai_insights:
+            # Display at-risk students
+            st.subheader("At-Risk Students")
+            
+            at_risk_students = ai_insights.get('at_risk_students', [])
+            if at_risk_students:
+                for student_data in at_risk_students:
+                    student_id = student_data.get('student_id')
+                    student = next((s for s in students if s['id'] == student_id), {})
+                    student_name = student.get('name', f"Student {student_id}")
+                    
+                    with st.expander(f"{student_name} - Risk Score: {student_data.get('risk_score', 0):.1f}/10"):
+                        st.write("**Risk Factors:**")
+                        for factor in student_data.get('risk_factors', []):
+                            st.warning(f"- {factor}")
+                        
+                        st.write("**Recommended Interventions:**")
+                        for intervention in student_data.get('interventions', []):
+                            st.info(f"- {intervention}")
+            else:
+                st.success("No students currently at risk based on the available data.")
+            
+            # Display content effectiveness
+            st.subheader("Content Effectiveness")
+            
+            content_analysis = ai_insights.get('content_effectiveness', {})
+            if content_analysis:
+                # Plot content effectiveness
+                effectiveness_data = content_analysis.get('assignments', [])
+                if effectiveness_data:
+                    # Create DataFrame
+                    eff_df = pd.DataFrame(effectiveness_data)
+                    
+                    if 'title' in eff_df.columns and 'effectiveness' in eff_df.columns:
+                        # Convert to percentage if needed
+                        eff_df['effectiveness'] = eff_df['effectiveness'].apply(lambda x: x * 100 if x <= 1 else x)
+                        
+                        # Sort by effectiveness
+                        eff_df = eff_df.sort_values('effectiveness', ascending=False)
+                        
+                        # Create horizontal bar chart
+                        fig, ax = plt.subplots(figsize=(10, max(5, len(eff_df) * 0.4)))
+                        
+                        # Create colorful bars based on effectiveness
+                        bars = ax.barh(eff_df['title'], eff_df['effectiveness'])
+                        for i, bar in enumerate(bars):
+                            effectiveness = eff_df['effectiveness'].iloc[i]
+                            if effectiveness < 60:
+                                bar.set_color('salmon')
+                            elif effectiveness < 80:
+                                bar.set_color('khaki')
+                            else:
+                                bar.set_color('lightgreen')
+                        
+                        ax.set_xlabel('Effectiveness (%)')
+                        ax.set_xlim(0, 100)
+                        
+                        plt.tight_layout()
+                        st.pyplot(fig)
+                
+                # Display content improvement suggestions
+                if 'improvement_suggestions' in content_analysis:
+                    st.subheader("Content Improvement Suggestions")
+                    for suggestion in content_analysis['improvement_suggestions']:
+                        st.write(f"- {suggestion}")
+            
+            # Display teaching recommendations
+            if 'teaching_recommendations' in ai_insights:
+                st.subheader("Teaching Strategy Recommendations")
+                
+                recommendations = ai_insights['teaching_recommendations']
+                for category, items in recommendations.items():
+                    st.write(f"**{category.replace('_', ' ').title()}:**")
+                    for item in items:
+                        st.write(f"- {item}")
+        else:
+            st.warning("Unable to generate AI insights. Please ensure sufficient data is available for analysis.")
+
+def main():
+    # Check if user is logged in
+    if not st.session_state.logged_in:
+        if st.session_state.current_page == 'login':
+            show_login_page()
+        elif st.session_state.current_page == 'register':
+            show_register_page()
+        else:
+            show_login_page()
+    else:
+        # Set up sidebar navigation
+        with st.sidebar:
+            st.image("https://i.imgur.com/ZVU5qN6.png", width=100)  # Replace with your logo
+            st.title("EduMate")
+            
+            # User info
+            st.write(f"Logged in as: **{st.session_state.current_user['name']}**")
+            st.write(f"Role: **{st.session_state.current_user['role'].capitalize()}**")
+            
+            st.divider()
+            
+            # Navigation options
+            if st.button("Dashboard", use_container_width=True):
+                st.session_state.current_page = 'dashboard'
                 st.rerun()
+            
+            # Role-specific navigation
+            if st.session_state.current_user['role'] == 'teacher':
+                if st.button("Teacher Analytics", use_container_width=True):
+                    st.session_state.current_page = 'teacher_analytics'
+                    st.rerun()
+                
+                if st.button("Group Management", use_container_width=True):
+                    st.session_state.current_page = 'group_management'
+                    st.rerun()
+            else:  # student
+                if st.button("Study Recommendations", use_container_width=True):
+                    st.session_state.current_page = 'study_recommendations'
+                    st.rerun()
+                
+                if st.button("My Groups", use_container_width=True):
+                    st.session_state.current_page = 'student_groups'
+                    st.rerun()
+                
+                if st.button("Learning Path", use_container_width=True):
+                    st.session_state.current_page = 'learning_path'
+                    st.rerun()
+            
+            st.divider()
+            
+            # Language settings
+            if st.button("Language Settings", use_container_width=True):
+                st.session_state.current_page = 'language_settings'
+                st.rerun()
+            
+            # Career planning
+            if st.button("Career Planning", use_container_width=True):
+                st.session_state.current_page = 'career_planning'
+                st.rerun()
+            
+            # Settings & Help
+            if st.button("System Settings", use_container_width=True):
+                st.session_state.current_page = 'settings'
+                st.rerun()
+            
+            if st.button("Help & Support", use_container_width=True):
+                st.session_state.current_page = 'help'
+                st.rerun()
+            
+            # Logout button at the bottom
+            st.divider()
+            if st.button("Logout", use_container_width=True):
+                st.session_state.logged_in = False
+                st.session_state.current_user = None
+                st.session_state.current_page = 'login'
+                st.rerun()
+        
+        # Main content area
+        if st.session_state.current_page == 'dashboard':
+            show_dashboard()
+        elif st.session_state.current_page == 'course_detail':
+            show_course_detail()
+        elif st.session_state.current_page == 'create_assignment':
+            show_create_assignment()
+        elif st.session_state.current_page == 'assignment_detail':
+            show_assignment_detail()
+        elif st.session_state.current_page == 'submission_detail':
+            show_submission_detail()
+        elif st.session_state.current_page == 'career_planning':
+            show_career_planning()
+        # New pages for enhanced services
+        elif st.session_state.current_page == 'teacher_analytics':
+            show_teacher_analytics()
+        elif st.session_state.current_page == 'group_management':
+            if st.session_state.current_user['role'] == 'teacher':
+                show_group_management()
+            else:
+                show_student_groups()
+        elif st.session_state.current_page == 'student_groups':
+            show_student_groups()
+        elif st.session_state.current_page == 'study_recommendations':
+            show_study_recommendations()
+        elif st.session_state.current_page == 'learning_path':
+            show_learning_path()
+        elif st.session_state.current_page == 'language_settings':
+            show_language_settings()
+        elif st.session_state.current_page == 'settings':
+            show_system_settings()
+        elif st.session_state.current_page == 'help':
+            show_help_and_support()
+        else:
+            show_dashboard()
+
+def show_study_recommendations():
+    """Display personalized study recommendations for students."""
+    st.title("Personalized Study Recommendations")
+    
+    # Get the current student's ID
+    student_id = st.session_state.current_user['id']
+    
+    # Get student's submissions
+    submissions = get_student_submissions(student_id)
+    
+    # Get student's courses
+    courses = get_student_courses(student_id)
+    
+    if not submissions:
+        st.info("You don't have any submissions yet. Here are some general study tips:")
+        
+        # Show general study tips
+        st.subheader("General Study Tips")
+        
+        tips = [
+            "Create a regular study schedule and stick to it",
+            "Take breaks using the Pomodoro Technique (25 minutes of study, 5 minutes break)",
+            "Find a quiet, distraction-free environment for studying",
+            "Stay organized with digital or physical planners",
+            "Prioritize tasks based on deadlines and importance",
+            "Review notes regularly, not just before exams",
+            "Form or join study groups for collaborative learning",
+            "Practice active recall instead of passive re-reading",
+            "Get enough sleep to consolidate memories and improve focus",
+            "Stay hydrated and maintain a balanced diet for optimal brain function"
+        ]
+        
+        for tip in tips:
+            st.write(f"• {tip}")
+            
+        return
+    
+    # Process submission data to prepare for recommendations
+    student_data = {
+        'courses': {},
+        'skills': {},
+        'overall_performance': {
+            'average_score': 0,
+            'submissions_count': len(submissions),
+            'completed_count': 0
+        }
+    }
+    
+    # Collect all scores
+    all_scores = []
+    
+    # Process each submission
+    for submission in submissions:
+        # Get assignment details
+        assignment = get_assignment_by_id(submission.get('assignment_id'))
+        if not assignment:
+            continue
+            
+        # Get course details
+        course_id = assignment.get('course_id')
+        course = get_course_by_id(course_id)
+        if not course:
+            continue
+            
+        # Initialize course data if not exists
+        if course_id not in student_data['courses']:
+            student_data['courses'][course_id] = {
+                'name': course.get('name'),
+                'code': course.get('code'),
+                'scores': [],
+                'submissions': [],
+                'skills': {}
+            }
+            
+        # Add submission data
+        score = submission.get('score')
+        if score is not None:
+            all_scores.append(score)
+            student_data['courses'][course_id]['scores'].append(score)
+            student_data['overall_performance']['completed_count'] += 1
+            
+        student_data['courses'][course_id]['submissions'].append(submission)
+        
+        # Extract skills from assignments and feedback
+        assignment_skills = extract_skills_from_assignment(assignment)
+        
+        # If the assignment has skills defined
+        for skill_name in assignment_skills:
+            # Update course skills
+            if skill_name not in student_data['courses'][course_id]['skills']:
+                student_data['courses'][course_id]['skills'][skill_name] = {
+                    'scores': [],
+                    'count': 0
+                }
+                
+            # Update global skills
+            if skill_name not in student_data['skills']:
+                student_data['skills'][skill_name] = {
+                    'scores': [],
+                    'count': 0,
+                    'courses': set()
+                }
+                
+            # If submission has score, add it to skill scores
+            if score is not None:
+                student_data['courses'][course_id]['skills'][skill_name]['scores'].append(score)
+                student_data['courses'][course_id]['skills'][skill_name]['count'] += 1
+                
+                student_data['skills'][skill_name]['scores'].append(score)
+                student_data['skills'][skill_name]['count'] += 1
+                student_data['skills'][skill_name]['courses'].add(course_id)
+    
+    # Calculate overall average score
+    if all_scores:
+        student_data['overall_performance']['average_score'] = sum(all_scores) / len(all_scores)
+    
+    # Generate recommendations using the service
+    recommendations = study_recommendations_service.generate_recommendations(
+        student_id=student_id,
+        student_data=student_data
+    )
+    
+    if recommendations:
+        # Display areas for improvement
+        st.subheader("Areas for Improvement")
+        improvement_areas = recommendations.get('improvement_areas', [])
+        if improvement_areas:
+            for area in improvement_areas:
+                skill_name = area.get('skill')
+                proficiency = area.get('proficiency', 0)
+                
+                # Calculate proficiency level for progress bar
+                if isinstance(proficiency, float) and proficiency <= 1:
+                    proficiency_percent = proficiency * 100
+                else:
+                    proficiency_percent = proficiency
+                
+                # Determine color based on proficiency
+                if proficiency_percent < 60:
+                    color = "red"
+                elif proficiency_percent < 80:
+                    color = "orange"
+                else:
+                    color = "green"
+                
+                # Display skill with progress bar
+                st.write(f"**{skill_name}**")
+                st.progress(float(proficiency_percent / 100))
+                st.caption(f"Current proficiency: {proficiency_percent:.1f}%")
+                
+                # Display improvement tips if available
+                if 'tips' in area:
+                    with st.expander("Improvement Tips"):
+                        for tip in area['tips']:
+                            st.write(f"• {tip}")
+                
+                st.divider()
+        else:
+            st.success("Great job! You're performing well in all areas.")
+        
+        # Display recommended resources
+        st.subheader("Recommended Resources")
+        resources = recommendations.get('resources', [])
+        if resources:
+            # Group resources by type
+            resource_types = {}
+            for resource in resources:
+                res_type = resource.get('type', 'Other')
+                if res_type not in resource_types:
+                    resource_types[res_type] = []
+                resource_types[res_type].append(resource)
+            
+            # Display resources by type
+            for res_type, type_resources in resource_types.items():
+                with st.expander(f"{res_type} ({len(type_resources)})"):
+                    for resource in type_resources:
+                        st.write(f"**{resource.get('title')}**")
+                        st.write(resource.get('description', ''))
+                        
+                        # Display URL if available
+                        if 'url' in resource:
+                            st.markdown(f"[Access Resource]({resource['url']})")
+                        
+                        # Display skill relevance if available
+                        if 'relevant_skills' in resource:
+                            st.caption(f"Relevant skills: {', '.join(resource['relevant_skills'])}")
+                        
+                        st.divider()
+        else:
+            st.info("No specific resources recommended at this time.")
+        
+        # Display practice activities
+        st.subheader("Practice Activities")
+        activities = recommendations.get('practice_activities', [])
+        if activities:
+            for activity in activities:
+                with st.expander(activity.get('title', 'Practice Activity')):
+                    st.write(activity.get('description', ''))
+                    
+                    # Display difficulty level if available
+                    if 'difficulty' in activity:
+                        difficulty = activity['difficulty']
+                        st.caption(f"Difficulty: {'●' * difficulty + '○' * (5 - difficulty)}")
+                    
+                    # Display estimated time if available
+                    if 'estimated_time' in activity:
+                        st.caption(f"Estimated time: {activity['estimated_time']} minutes")
+                    
+                    # Display relevant skills if available
+                    if 'relevant_skills' in activity:
+                        st.caption(f"Skills: {', '.join(activity['relevant_skills'])}")
+        else:
+            st.info("No specific practice activities recommended at this time.")
+        
+        # Display study schedule
+        st.subheader("Recommended Study Schedule")
+        schedule = recommendations.get('schedule', {})
+        if schedule:
+            # Display time allocation
+            if 'time_allocation' in schedule:
+                time_allocation = schedule['time_allocation']
+                
+                # Create DataFrame for time allocation
+                allocation_data = []
+                for subject, minutes in time_allocation.items():
+                    allocation_data.append({
+                        'Subject': subject,
+                        'Minutes per Day': minutes
+                    })
+                
+                if allocation_data:
+                    allocation_df = pd.DataFrame(allocation_data)
+                    
+                    # Create a horizontal bar chart
+                    fig, ax = plt.subplots(figsize=(10, max(4, len(allocation_df) * 0.5)))
+                    bars = ax.barh(allocation_df['Subject'], allocation_df['Minutes per Day'], color='skyblue')
+                    ax.set_xlabel('Minutes per Day')
+                    ax.set_title('Recommended Daily Study Time')
+                    
+                    # Add minutes as text to the right of each bar
+                    for i, bar in enumerate(bars):
+                        minutes = allocation_df['Minutes per Day'].iloc[i]
+                        ax.text(minutes + 2, i, f"{minutes} min", va='center')
+                    
+                    plt.tight_layout()
+                    st.pyplot(fig)
+            
+            # Display weekly schedule if available
+            if 'weekly_plan' in schedule:
+                weekly_plan = schedule['weekly_plan']
+                
+                # Create a table for the weekly plan
+                st.write("**Weekly Study Plan**")
+                plan_data = []
+                
+                days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                for day in days:
+                    if day in weekly_plan:
+                        day_tasks = weekly_plan[day]
+                        plan_data.append({
+                            'Day': day,
+                            'Focus': ', '.join(day_tasks)
+                        })
+                
+                if plan_data:
+                    st.table(pd.DataFrame(plan_data))
+        else:
+            st.info("No specific study schedule recommended at this time.")
+        
+        # Display AI study tips
+        st.subheader("Personalized Study Tips")
+        ai_tips = recommendations.get('ai_tips', [])
+        if ai_tips:
+            for tip in ai_tips:
+                st.write(f"• {tip}")
+        else:
+            st.info("No personalized study tips available at this time.")
+        
+        # Display when recommendations were generated
+        if 'generated_at' in recommendations:
+            try:
+                generated_at = datetime.fromisoformat(recommendations['generated_at'])
+                st.caption(f"Recommendations generated on {generated_at.strftime('%B %d, %Y at %I:%M %p')}")
+            except:
+                st.caption("Recommendations recently generated")
+    else:
+        st.warning("Unable to generate personalized recommendations at this time. Please try again later.")
+
+def extract_skills_from_assignment(assignment):
+    """Extract skills from an assignment."""
+    skills = []
+    
+    # Try to get skills from the assignment data
+    if 'skills' in assignment:
+        assignment_skills = assignment.get('skills', [])
+        if isinstance(assignment_skills, list):
+            skills.extend(assignment_skills)
+        elif isinstance(assignment_skills, str):
+            skills.append(assignment_skills)
+    
+    # If no skills found, try to extract from description
+    if not skills and 'description' in assignment:
+        # Extract skills from keywords in the description
+        description = assignment.get('description', '').lower()
+        
+        # List of common academic skills
+        common_skills = [
+            "critical thinking", "problem solving", "research", "writing",
+            "analysis", "communication", "presentation", "teamwork",
+            "programming", "data analysis", "mathematics", "statistics",
+            "reading comprehension", "creativity", "design", "experiment"
+        ]
+        
+        # Check for skills in description
+        for skill in common_skills:
+            if skill in description:
+                skills.append(skill.title())
+    
+    # If still no skills, add generic skill based on assignment title
+    if not skills and 'title' in assignment:
+        title = assignment.get('title', '').lower()
+        if 'essay' in title or 'writing' in title:
+            skills.append('Writing')
+        elif 'problem' in title or 'exercise' in title:
+            skills.append('Problem Solving')
+        elif 'research' in title:
+            skills.append('Research')
+        elif 'presentation' in title:
+            skills.append('Presentation')
+        elif 'quiz' in title or 'test' in title:
+            skills.append('Knowledge Recall')
+        else:
+            skills.append('General Academic Skills')
+    
+    return skills
 
 if __name__ == "__main__":
     main()
