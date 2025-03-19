@@ -578,7 +578,7 @@ class AIGradingService:
         # Remove excessive whitespace
         text = re.sub(r'\s+', ' ', text)
         # Fix common encoding issues
-        text = text.replace("â€™", "'").replace("â€"", "—").replace("â€œ", """).replace("â€", """)
+        text = text.replace("â\u20ac\u2122", "'").replace("â\u20ac\"", "-").replace("â\u20ac\u201c", '"').replace("â\u20ac", '"')
         return text.strip()
     
     def _detect_language(self, code: str) -> str:

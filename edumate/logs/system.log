@@ -642,3 +642,6 @@
 2025-03-17 21:09:15,917 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
 2025-03-17 21:09:20,372 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
 2025-03-17 21:09:20,523 [INFO] Database initialized successfully at data\teacher_tools\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-19 18:09:34,856 [INFO] Database initialized successfully at data\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-19 18:10:52,077 [INFO] Database initialized successfully at data\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}
+2025-03-19 18:25:06,453 [INFO] Database initialized successfully at data\teacher_tools.db - {C:\Users\gowth\source\repos\fygt\edumate\utils\logger.py:41}

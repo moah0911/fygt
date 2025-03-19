@@ -66,21 +66,21 @@ analytics = Analytics('data')
 audit_trail = AuditTrail('data')
 career_planner = CareerPlanner('data')
 indian_education = IndianEducationSystem()
-exam_manager = ExamManager()
-classroom_manager = ClassroomManager()
-teacher_tools = TeacherTools()
+exam_manager = ExamManager('data')
+classroom_manager = ClassroomManager('data')
+teacher_tools = TeacherTools('data')
 
 # Initialize services
 gemini_service = GeminiService()  # Initialize with your API key
-grading_service = GradingService(gemini_service=gemini_service)
-feedback_service = FeedbackService(gemini_service=gemini_service)
+grading_service = GradingService()
+feedback_service = FeedbackService()
 plagiarism_service = PlagiarismService()
-ai_service = AIService(gemini_service=gemini_service)
-ai_grading_service = AIGradingService(gemini_service=gemini_service)
-study_recommendations_service = StudyRecommendationsService(gemini_service=gemini_service)
+ai_service = AIService()
+ai_grading_service = AIGradingService()
+study_recommendations_service = StudyRecommendationsService(gemini_service=gemini_service, data_dir='data')
 group_formation_service = GroupFormationService()
 learning_path_service = LearningPathService()
-multilingual_feedback_service = MultilingualFeedbackService(gemini_service=gemini_service)
+multilingual_feedback_service = MultilingualFeedbackService(gemini_service=gemini_service, data_dir='data')
 teacher_analytics_service = TeacherAnalyticsService()
 
 # Set page configuration
@@ -580,26 +580,26 @@ def auto_grade_submission(submission_id):
     """
     try:
         # Load submissions and get the specific submission
-        submissions = load_data('submissions')
+    submissions = load_data('submissions')
         submission = next((s for s in submissions if s['id'] == submission_id), None)
-        
-        if not submission:
+    
+    if not submission:
             return False, "Submission not found."
-        
+    
         # Get the assignment details
-        assignment = get_assignment_by_id(submission['assignment_id'])
+    assignment = get_assignment_by_id(submission['assignment_id'])
         if not assignment:
             return False, "Assignment not found."
-        
+    
         # Use the GradingService to grade the submission
-        file_content = ""
-        file_analysis = ""
-        
+    file_content = ""
+    file_analysis = ""
+    
         # Get file content if available
-        if submission.get('file_info'):
+    if submission.get('file_info'):
             file_path = submission['file_info']['file_path']
             file_type = submission['file_info']['file_type']
-            
+        
             try:
                 # Extract text based on file type
                 if file_type == 'application/pdf':
@@ -616,7 +616,7 @@ def auto_grade_submission(submission_id):
             except Exception as e:
                 log_error(f"Error processing file for auto-grading: {str(e)}")
                 file_analysis = f"Error analyzing file: {str(e)}"
-        
+    
         # Get combined content
         combined_content = submission['content']
         if file_content:
@@ -685,7 +685,7 @@ def auto_grade_submission(submission_id):
         submission['plagiarism_data'] = plagiarism_result
         
         # Save the updated submissions
-        save_data(submissions, 'submissions')
+            save_data(submissions, 'submissions')
         
         # Log the action
         log_audit(
@@ -2092,277 +2092,312 @@ def show_student_dashboard():
                     # Check if graded
                     if submission.get('score') is not None:
                         st.success(f"{assignment.get('title')} - {course_name} - Scored {submission.get('score')}/{assignment.get('points', 100)} - {submission_date}")
-                    else:
-            skill['proficiency'] = 0
-            
-        # Define status based on proficiency
-        if skill['proficiency'] >= 0.8:
-            skill['status'] = "mastered"
-        elif skill['proficiency'] >= 0.6:
-            skill['status'] = "proficient"
-        elif skill['proficiency'] > 0:
-            skill['status'] = "developing"
+                else:
+                        st.info(f"{assignment.get('title')} - {course_name} - Submitted (awaiting grade) - {submission_date}")
+        
+        # Quick links
+        st.subheader("Quick Links")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("Study Recommendations", use_container_width=True):
+                st.session_state.current_page = 'study_recommendations'
+                st.rerun()
+        
+        with col2:
+            if st.button("Learning Path", use_container_width=True):
+                st.session_state.current_page = 'learning_path'
+                st.rerun()
+        
+        with col3:
+            if st.button("View My Groups", use_container_width=True):
+                st.session_state.current_page = 'group_management'
+                st.rerun()
+    
+    # Courses tab
+    with tab2:
+        st.header("My Courses")
+        if not courses:
+            st.info("You haven't enrolled in any courses yet.")
         else:
-            skill['status'] = "not_started"
-    
-    # Get learning path visualization
-    with st.spinner("Generating your learning path..."):
-        learning_path = learning_path_service.generate_learning_path(
-            student_id=student_id,
-            course_id=selected_course['id'],
-            skill_data=list(skill_data.values())
-        )
-    
-    # Display learning path visualization
-    if learning_path.get("status") == "error":
-        st.error(f"Error generating learning path: {learning_path.get('message')}")
-        return
-    
-    # Display skill graph
-    st.subheader("Your Skill Map")
-    
-    # Get the visualization data
-    viz_data = learning_path.get("visualization", {})
-    
-    if viz_data.get("html"):
-        # Display interactive graph
-        st.components.v1.html(viz_data.get("html"), height=500)
-    elif viz_data.get("image_path"):
-        # Display static image
-        st.image(viz_data.get("image_path"))
-    else:
-        # Fallback to basic visualization
-        st.write("Skill map visualization not available.")
-    
-    # Display proficiency summary
-    st.subheader("Your Proficiency Summary")
-    
-    # Group skills by status
-    skills_by_status = {
-        "mastered": [],
-        "proficient": [],
-        "developing": [],
-        "not_started": [],
-        "recommended": []
-    }
-    
-    # Add all skills to their status group
-    for skill_name, skill in skill_data.items():
-        skills_by_status[skill['status']].append(skill)
-    
-    # Add recommended skills
-    for skill in learning_path.get("recommended_skills", []):
-        if isinstance(skill, dict) and 'name' in skill:
-            # Check if skill is already in our data
-            if skill['name'] not in skill_data:
-                skills_by_status["recommended"].append(skill)
-    
-    # Create columns for different status groups
-    status_labels = {
-        "mastered": "🟢 Mastered", 
-        "proficient": "🟠 Proficient", 
-        "developing": "🟡 Developing", 
-        "not_started": "⚪ Not Started",
-        "recommended": "⭐ Recommended Next"
-    }
-    
-    # Show skills by status
-    for status, label in status_labels.items():
-        if skills_by_status[status]:
-            st.write(f"**{label}**")
-            
-            for skill in skills_by_status[status]:
-                # Calculate width based on proficiency
-                proficiency = skill.get('proficiency', 0)
-                
-                # Create progress bar
-                col1, col2 = st.columns([4, 1])
+            for course in courses:
+                col1, col2 = st.columns([3, 1])
                 with col1:
-                    st.write(f"{skill['name']}")
+                    st.subheader(f"{course['name']} ({course['code']})")
+                    st.write(course['description'])
+                    st.write(f"**Period:** {course['start_date']} to {course['end_date']}")
+                    
+                    # Get enrollment count
+                    enrolled_students = [s for s in course.get('students_enrolled', []) 
+                                        if isinstance(s, dict) and s.get('status') == 'active']
+                    st.write(f"**Students enrolled:** {len(enrolled_students)}")
+                    
+                    # Get assignment count
+                    assignments = get_course_assignments(course['id'])
+                    st.write(f"**Assignments:** {len(assignments)}")
+                
                 with col2:
-                    if proficiency > 0:
-                        st.progress(proficiency)
-                        st.caption(f"{proficiency * 100:.0f}%")
+                    if st.button("View Course", key=f"view_course_{course['id']}"):
+                        st.session_state.current_course = course
+                        st.session_state.current_page = 'course_detail'
+                        st.rerun()
+                    
+                    if st.button("Add Assignment", key=f"add_assignment_{course['id']}"):
+                        st.session_state.current_course = course
+                        st.session_state.current_page = 'create_assignment'
+                        st.rerun()
+                
+                st.divider()
+    
+    # Assignments tab
+    with tab3:
+        st.header("My Assignments")
+        if not submissions:
+            st.info("You haven't submitted any assignments yet.")
+        else:
+            # Sort submissions by date (newest first)
+            submissions.sort(key=lambda x: x.get('submitted_at', ''), reverse=True)
+            
+            # Show last 5 submissions
+            for submission in submissions[:5]:
+                assignment = get_assignment_by_id(submission.get('assignment_id'))
+                if assignment:
+                    course = get_course_by_id(assignment.get('course_id'))
+                    course_name = course.get('name', 'Unknown Course') if course else 'Unknown Course'
+                    
+                    # Format submission date
+                    submission_date = submission.get('submitted_at', '')
+                    if submission_date:
+                        try:
+                            submission_date = datetime.fromisoformat(submission_date).strftime("%B %d, %Y")
+                        except:
+                            pass
+                    
+                    # Check if graded
+                    if submission.get('score') is not None:
+                        st.success(f"{assignment.get('title')} - {course_name} - Scored {submission.get('score')}/{assignment.get('points', 100)} - {submission_date}")
                     else:
-                        st.caption("Not started")
+                        st.info(f"{assignment.get('title')} - {course_name} - Submitted (awaiting grade) - {submission_date}")
     
-    # Display resources section
-    st.subheader("Recommended Resources")
-    resources = learning_path.get("resources", [])
-    
-    if not resources:
-        st.info("No specific resources available at this time.")
-    else:
-        # Show resources by skill
-        resources_by_skill = {}
-        for resource in resources:
-            skill = resource.get("skill", "General")
-            if skill not in resources_by_skill:
-                resources_by_skill[skill] = []
-            resources_by_skill[skill].append(resource)
+    # Performance Analytics tab
+    with tab4:
+        st.header("Performance Analytics")
         
-        # Display resources
-        for skill, skill_resources in resources_by_skill.items():
-            with st.expander(f"Resources for {skill}"):
-                for resource in skill_resources:
-                    st.markdown(f"**[{resource.get('title', 'Resource')}]({resource.get('url', '#')})**")
-                    if "description" in resource:
-                        st.caption(resource.get("description"))
-                    st.caption(f"Type: {resource.get('type', 'Unknown')}")
-    
-    # Next steps section
-    st.subheader("Suggested Next Steps")
-    next_steps = learning_path.get("next_steps", [])
-    
-    if not next_steps:
-        st.info("Complete more assignments to receive personalized next steps.")
-    else:
-        for i, step in enumerate(next_steps):
-            st.markdown(f"**{i+1}. {step.get('title', 'Next step')}**")
-            st.write(step.get("description", ""))
+        # Get student's overall performance
+        overall_performance = get_student_overall_performance(student_id)
+        
+        if overall_performance:
+            st.subheader("Overall Performance")
+            st.write(f"**Average Score:** {overall_performance['average_score']:.1f}%")
+            st.write(f"**Completion Rate:** {overall_performance['completion_rate']:.1f}%")
+            st.write(f"**Submissions:** {overall_performance['submissions_count']}")
             
-            # If there are resources for this step, show them
-            if "resources" in step and step["resources"]:
-                with st.expander("Related Resources"):
-                    for resource in step["resources"]:
-                        st.markdown(f"- [{resource.get('title', 'Resource')}]({resource.get('url', '#')})")
-    
-    # Generation time
-    if "generated_at" in learning_path:
-        try:
-            generated_date = datetime.fromisoformat(learning_path["generated_at"]).strftime("%B %d, %Y")
-            st.caption(f"Learning path generated on {generated_date}")
-        except:
-            st.caption("Learning path recently generated")
-
-def translate_feedback(feedback_text, target_language):
-    """
-    Translate feedback to the target language using the multilingual feedback service.
-    
-    Args:
-        feedback_text: The feedback text to translate
-        target_language: The target language code (e.g., 'es', 'fr')
-        
-    Returns:
-        Translated feedback text
-    """
-    try:
-        # Get the translation
-        result = multilingual_feedback_service.translate_feedback(
-            text=feedback_text,
-            target_language=target_language
-        )
-        
-        if result.get("status") == "error":
-            return feedback_text  # Return original text on error
+            # Display skill graph
+            st.subheader("Skill Graph")
+            skill_data = overall_performance['skill_data']
+            if skill_data:
+                # Convert skill_data dictionary to list
+                skills_list = [{'name': k, **v} for k, v in skill_data.items()]
+                
+                # Generate skill graph
+                skill_graph = generate_skill_graph(skills_list)
+                
+                # Display skill graph
+                st.components.v1.html(skill_graph, height=300)
+            else:
+                st.info("No skill data available.")
             
-        return result.get("translated_text", feedback_text)
-    except Exception as e:
-        log_error(f"Error translating feedback: {str(e)}")
-        return feedback_text  # Return original text on error
-
-def get_student_language_preference(student_id):
-    """Get the preferred language for a student"""
-    try:
-        # Get user preferences
-        users = load_data('users')
-        user = next((u for u in users if u['id'] == student_id), None)
-        
-        if user and 'preferences' in user and 'language' in user['preferences']:
-            return user['preferences']['language']
+            # Display skill proficiency summary
+            st.subheader("Skill Proficiency Summary")
+            skill_summary = get_skill_summary(skills_list)
+            if skill_summary:
+                # Create DataFrame for skill summary
+                skill_summary_df = pd.DataFrame(skill_summary)
+                st.dataframe(skill_summary_df)
+            else:
+                st.info("No skill data available.")
             
-        # Default to English
-        return 'en'
-    except Exception as e:
-        log_error(f"Error getting language preference: {str(e)}")
-        return 'en'
-
-def set_student_language_preference(student_id, language_code):
-    """Set the preferred language for a student"""
-    try:
-        # Get user data
-        users = load_data('users')
+            # Display skill gap analysis
+            st.subheader("Skill Gap Analysis")
+            skill_gaps = get_skill_gaps(skills_list)
+            if skill_gaps:
+                # Create DataFrame for skill gaps
+                skill_gaps_df = pd.DataFrame(skill_gaps)
+                st.dataframe(skill_gaps_df)
+            else:
+                st.info("No skill gaps found.")
+            
+            # Display skill development over time
+            st.subheader("Skill Development Over Time")
+            skill_development_data = get_skill_development_data(student_id)
+            if skill_development_data:
+                # Create DataFrame for skill development
+                skill_development_df = pd.DataFrame(skill_development_data)
+                st.dataframe(skill_development_df)
+            else:
+                st.info("No skill development data available.")
+            
+            # Display most improved and struggling areas
+            st.subheader("Most Improved and Struggling Areas")
+            trends = get_trends(student_id)
+            if trends:
+                # Create DataFrame for trends
+                trends_df = pd.DataFrame(trends)
+                st.dataframe(trends_df)
+            else:
+                st.info("No trends data available.")
+    
+    # Career Planning tab
+    with tab5:
+        st.header("Career Planning")
         
-        # Find user and update preferences
-        for i, user in enumerate(users):
-            if user['id'] == student_id:
-                if 'preferences' not in user:
-                    users[i]['preferences'] = {}
+        # Get career data
+        career_data = get_career_data()
+        
+        if career_data:
+            st.subheader("Career Path")
+            st.write(f"**Current Skill Level:** {career_data['current_skill_level']}")
+            st.write(f"**Target Skill Level:** {career_data['target_skill_level']}")
+            st.write(f"**Years to Reach Target:** {career_data['years_to_reach_target']}")
+            
+            # Display skill matrix
+            st.subheader("Skill Matrix")
+            skill_matrix = career_data['skill_matrix']
+            if skill_matrix:
+                # Create DataFrame for skill matrix
+                skill_matrix_df = pd.DataFrame(skill_matrix)
+                st.dataframe(skill_matrix_df)
+                    else:
+                st.info("No skill matrix data available.")
+            
+            # Display recommended courses
+            st.subheader("Recommended Courses")
+            recommended_courses = career_data['recommended_courses']
+            if recommended_courses:
+                # Create DataFrame for recommended courses
+                recommended_courses_df = pd.DataFrame(recommended_courses)
+                st.dataframe(recommended_courses_df)
+        else:
+                st.info("No recommended courses available.")
+            
+            # Display recommended resources
+            st.subheader("Recommended Resources")
+            resources = career_data['recommended_resources']
+            if resources:
+                # Group resources by type
+                resource_types = {}
+                for resource in resources:
+                    res_type = resource.get('type', 'Other')
+                    if res_type not in resource_types:
+                        resource_types[res_type] = []
+                    resource_types[res_type].append(resource)
                 
-                users[i]['preferences']['language'] = language_code
-                
-                # Save updated users
-                save_data(users, 'users')
-                
-                # Update multilingual service cache
-                multilingual_feedback_service.set_student_language_preference(student_id, language_code)
-                
-                return True
-                
-        return False
-    except Exception as e:
-        log_error(f"Error setting language preference: {str(e)}")
-        return False
+                # Display resources by type
+                for res_type, type_resources in resource_types.items():
+                    with st.expander(f"{res_type} ({len(type_resources)})"):
+                        for resource in type_resources:
+                            st.write(f"**{resource.get('title')}**")
+                            st.write(resource.get('description', ''))
+                            
+                            # Display URL if available
+                            if 'url' in resource:
+                                st.markdown(f"[Access Resource]({resource['url']})")
+                            
+                            # Display skill relevance if available
+                            if 'relevant_skills' in resource:
+                                st.caption(f"Relevant skills: {', '.join(resource['relevant_skills'])}")
+                            
+                            st.divider()
+            else:
+                st.info("No recommended resources available.")
+        else:
+            st.info("No career data available.")
 
 def show_language_settings():
-    """Show language settings for the current user"""
-    student_id = st.session_state.current_user['id']
+    """Display language settings for current user."""
+    st.title("Language Settings")
     
-    # Get available languages
-    languages = multilingual_feedback_service.get_supported_languages()
+    # Get current user
+    user_id = st.session_state.current_user['id']
+    user_role = st.session_state.current_user['role']
     
-    # Get current preference
-    current_lang = get_student_language_preference(student_id)
+    # Get supported languages from service
+    supported_languages = multilingual_feedback_service.get_supported_languages()
     
-    # Format language options
-    language_options = {}
-    for lang in languages:
-        code = lang.get('code')
-        name = lang.get('name')
-        language_options[code] = f"{name} ({code})"
+    # Convert to options for selectbox
+    language_options = [{
+        'code': lang['code'],
+        'name': lang['name']
+    } for lang in supported_languages]
     
-    # Show language selector
-    selected_lang = st.selectbox(
-        "Select your preferred language for feedback",
-        options=list(language_options.keys()),
-        format_func=lambda x: language_options[x],
-        index=list(language_options.keys()).index(current_lang) if current_lang in language_options else 0
+    # Get current language preference
+    current_language = get_student_language_preference(user_id)
+    
+    # Find current language index
+    current_index = 0
+    for i, lang in enumerate(language_options):
+        if lang['code'] == current_language:
+            current_index = i
+            break
+    
+    st.subheader("Select Your Preferred Language")
+    st.write("This will be used for translating feedback and system messages.")
+    
+    # Language selector
+    selected_language = st.selectbox(
+        "Preferred Language",
+        options=language_options,
+        format_func=lambda x: x['name'],
+        index=current_index
     )
     
     # Save button
     if st.button("Save Language Preference"):
-        if set_student_language_preference(student_id, selected_lang):
-            st.success(f"Language preference updated to {language_options[selected_lang]}")
+        if set_student_language_preference(user_id, selected_language['code']):
+            st.success(f"Language preference updated to {selected_language['name']}.")
         else:
-            st.error("Failed to update language preference")
-            
+            st.error("Failed to update language preference. Please try again.")
+    
     # Preview section
     st.subheader("Translation Preview")
     
-    sample_feedback = """
-    Great work on your assignment! Your explanation of the problem was clear and well-structured. 
-    However, you could improve the analysis section by adding more supporting evidence.
-    """
+    # Original text
+    original_text = st.text_area(
+        "Enter text to preview translation",
+        value="Great work on this assignment! Your analysis was thorough and well-structured. Next time, try to include more specific examples to support your arguments."
+    )
     
-    # Show original and translated version
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.write("**Original (English):**")
-        st.write(sample_feedback)
+    if original_text:
+        # Translate to selected language
+        translated_text = translate_feedback(original_text, selected_language['code'])
         
-    with col2:
-        # Only show translation if language is not English
-        if selected_lang != 'en':
-            st.write(f"**Translated ({language_options[selected_lang]}):**")
-            translated = translate_feedback(sample_feedback, selected_lang)
-            st.write(translated)
-        else:
-            st.write("**Translated:**")
-            st.write("Same as original (English)")
-            
-    # Show note about translation
-    st.caption("Note: All your feedback will be automatically translated to your preferred language.")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**Original Text (English)**")
+            st.write(original_text)
+        
+        with col2:
+            st.write(f"**Translated Text ({selected_language['name']})**")
+            st.write(translated_text)
+    
+    # Language information
+    with st.expander("About Language Support"):
+        st.write("""
+        EduMate provides automatic translation of feedback and important system messages in multiple languages. 
+        This helps ensure that all students can access and understand feedback in their preferred language.
+        
+        **How it works:**
+        
+        1. Select your preferred language from the dropdown menu above
+        2. Save your preference using the button
+        3. All feedback from teachers and AI will be automatically translated to your preferred language
+        
+        You can change your language preference at any time by returning to this page.
+        """)
+        
+        st.caption("Note: All your feedback will be automatically translated to your preferred language.")
 
 def show_teacher_analytics():
     """Display the enhanced Teacher Analytics Dashboard using the TeacherAnalyticsService."""
@@ -2433,11 +2468,11 @@ def show_teacher_analytics():
             metrics = dashboard_data.get('class_metrics', {})
             col1, col2, col3, col4 = st.columns(4)
             
-            with col1:
+                with col1:
                 avg_score = metrics.get('average_score', 0)
                 st.metric("Average Score", f"{avg_score:.1f}%")
             
-            with col2:
+                with col2:
                 completion_rate = metrics.get('completion_rate', 0) * 100
                 st.metric("Completion Rate", f"{completion_rate:.1f}%")
             
@@ -2550,7 +2585,7 @@ def show_teacher_analytics():
         
         if not students:
             st.info("No students enrolled in this course yet.")
-        else:
+                else:
             # Allow comparing specific students
             selected_students = st.multiselect(
                 "Select Students to Compare",
@@ -2687,9 +2722,9 @@ def show_teacher_analytics():
                             if skill_df_data:
                                 skill_df = pd.DataFrame(skill_df_data)
                                 st.dataframe(skill_df)
-                else:
+                                    else:
                     st.warning("Unable to generate student comparison. Please ensure selected students have submitted assignments.")
-            else:
+                                                else:
                 st.info("Please select at least one student to compare.")
     
     with tab3:
@@ -2921,7 +2956,7 @@ def main():
             show_login_page()
         elif st.session_state.current_page == 'register':
             show_register_page()
-        else:
+    else:
             show_login_page()
     else:
         # Set up sidebar navigation
@@ -2938,7 +2973,7 @@ def main():
             # Navigation options
             if st.button("Dashboard", use_container_width=True):
                 st.session_state.current_page = 'dashboard'
-                st.rerun()
+                            st.rerun()
             
             # Role-specific navigation
             if st.session_state.current_user['role'] == 'teacher':
@@ -2948,7 +2983,7 @@ def main():
                 
                 if st.button("Group Management", use_container_width=True):
                     st.session_state.current_page = 'group_management'
-                    st.rerun()
+                            st.rerun()
             else:  # student
                 if st.button("Study Recommendations", use_container_width=True):
                     st.session_state.current_page = 'study_recommendations'
@@ -2960,8 +2995,8 @@ def main():
                 
                 if st.button("Learning Path", use_container_width=True):
                     st.session_state.current_page = 'learning_path'
-                    st.rerun()
-            
+                        st.rerun()
+                
             st.divider()
             
             # Language settings
@@ -3183,7 +3218,7 @@ def show_study_recommendations():
                         for tip in area['tips']:
                             st.write(f"• {tip}")
                 
-                st.divider()
+        st.divider()
         else:
             st.success("Great job! You're performing well in all areas.")
         
@@ -3362,6 +3397,701 @@ def extract_skills_from_assignment(assignment):
             skills.append('General Academic Skills')
     
     return skills
+
+def show_learning_path():
+    """Display the interactive learning path visualization for students."""
+    st.title("Interactive Learning Path")
+    
+    # Verify the user is a student
+    if st.session_state.current_user['role'] != 'student':
+        st.warning("Learning path visualization is only available for students.")
+        return
+    
+    # Get the student's ID
+    student_id = st.session_state.current_user['id']
+    
+    # Get student's courses
+    courses = get_student_courses(student_id)
+    
+    if not courses:
+        st.info("You're not enrolled in any courses yet. Please enroll in courses to see your learning path.")
+        return
+    
+    # Let the student select a course for the learning path
+    selected_course = st.selectbox(
+        "Select a course to generate learning path",
+        options=courses,
+        format_func=lambda x: f"{x['name']} ({x['code']})"
+    )
+    
+    if not selected_course:
+        st.warning("Please select a course to view your learning path.")
+        return
+    
+    # Get student's submissions for this course
+    submissions = get_student_submissions(student_id)
+    course_submissions = []
+    
+    for submission in submissions:
+        assignment = get_assignment_by_id(submission.get('assignment_id'))
+        if assignment and assignment.get('course_id') == selected_course['id']:
+            # Add assignment info to submission
+            submission['assignment'] = assignment
+            course_submissions.append(submission)
+    
+    if not course_submissions:
+        st.warning(f"You don't have any submissions for {selected_course['name']} yet.")
+        st.info("Your learning path will be based on the course curriculum. Submit assignments to get a personalized path.")
+        
+        # Get course assignments to infer skills
+        assignments = get_course_assignments(selected_course['id'])
+        if not assignments:
+            st.error("This course doesn't have any assignments yet.")
+            return
+        
+        # Extract skills from assignments
+        skill_data = {}
+        for assignment in assignments:
+            skills = extract_skills_from_assignment(assignment)
+            for skill in skills:
+                if skill not in skill_data:
+                    skill_data[skill] = {
+                        'name': skill,
+                        'status': 'not_started',
+                        'proficiency': 0.0,
+                        'assignments': []
+                    }
+                skill_data[skill]['assignments'].append(assignment['id'])
+    else:
+        # Process submissions to collect skill data
+        skill_data = {}
+        
+        for submission in course_submissions:
+            assignment = submission.get('assignment')
+            if not assignment:
+                continue
+                
+            # Extract skills from the assignment
+            skills = extract_skills_from_assignment(assignment)
+            
+            for skill in skills:
+                if skill not in skill_data:
+                    skill_data[skill] = {
+                        'name': skill,
+                        'scores': [],
+                        'proficiency': 0.0,
+                        'status': 'not_started',
+                        'assignments': []
+                    }
+                
+                # Add assignment to this skill
+                if assignment['id'] not in skill_data[skill]['assignments']:
+                    skill_data[skill]['assignments'].append(assignment['id'])
+                
+                # Add score if available
+                score = submission.get('score')
+                if score is not None:
+                    # Normalize score to 0-1 range
+                    max_points = assignment.get('points', 100)
+                    normalized_score = score / max_points
+                    skill_data[skill]['scores'].append(normalized_score)
+        
+        # Calculate average scores and proficiency levels
+        for skill_name, skill in skill_data.items():
+            if skill['scores']:
+                avg_score = sum(skill['scores']) / len(skill['scores'])
+                skill['proficiency'] = avg_score
+                
+                # Set status based on proficiency
+                if avg_score >= 0.8:
+                    skill['status'] = 'mastered'
+                elif avg_score >= 0.6:
+                    skill['status'] = 'proficient'
+                elif avg_score > 0:
+                    skill['status'] = 'developing'
+                else:
+                    skill['status'] = 'not_started'
+            else:
+                skill['status'] = 'not_started'
+                skill['proficiency'] = 0.0
+    
+    # Generate learning path visualization
+    if skill_data:
+        # Convert skill_data dictionary to list
+        skills_list = [{'name': k, **v} for k, v in skill_data.items()]
+        
+        # Generate learning path using the service
+        learning_path = learning_path_service.generate_learning_path(
+            student_id=student_id,
+            course_id=selected_course['id'],
+            skills=skills_list
+        )
+        
+        if learning_path:
+            # Display the skill map visualization
+            st.subheader("Your Skill Map")
+            
+            # Display the visualization from the learning path service
+            skill_graph_html = learning_path.get('visualization_html')
+            if skill_graph_html:
+                st.components.v1.html(skill_graph_html, height=600)
+            else:
+                # Fallback to a simpler visualization
+                st.warning("Interactive visualization couldn't be generated. Showing simplified view.")
+                
+                # Group skills by status
+                status_groups = {
+                    'mastered': [],
+                    'proficient': [],
+                    'developing': [],
+                    'not_started': []
+                }
+                
+                for skill in skills_list:
+                    status = skill.get('status', 'not_started')
+                    status_groups[status].append(skill)
+                
+                # Display skills by status
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**Mastered Skills**")
+                    if status_groups['mastered']:
+                        for skill in status_groups['mastered']:
+                            st.success(f"{skill['name']} ({skill['proficiency']*100:.1f}%)")
+                    else:
+                        st.info("No mastered skills yet")
+                    
+                    st.write("**Developing Skills**")
+                    if status_groups['developing']:
+                        for skill in status_groups['developing']:
+                            st.warning(f"{skill['name']} ({skill['proficiency']*100:.1f}%)")
+                else:
+                        st.info("No developing skills yet")
+                
+                with col2:
+                    st.write("**Proficient Skills**")
+                    if status_groups['proficient']:
+                        for skill in status_groups['proficient']:
+                            st.info(f"{skill['name']} ({skill['proficiency']*100:.1f}%)")
+                    else:
+                        st.info("No proficient skills yet")
+                    
+                    st.write("**Not Started Skills**")
+                    if status_groups['not_started']:
+                        for skill in status_groups['not_started']:
+                            st.error(f"{skill['name']} (0%)")
+                    else:
+                        st.info("No skills remaining to start")
+            
+            # Display skill proficiency summary
+            st.subheader("Skill Proficiency Summary")
+            
+            # Create a DataFrame for the skills
+            skill_summary = []
+            for skill in skills_list:
+                skill_summary.append({
+                    'Skill': skill['name'],
+                    'Proficiency': skill['proficiency'] * 100,
+                    'Status': skill['status'].replace('_', ' ').title()
+                })
+            
+            if skill_summary:
+                # Sort by proficiency (highest first)
+                skill_df = pd.DataFrame(skill_summary).sort_values('Proficiency', ascending=False)
+                
+                # Display as a bar chart
+                fig, ax = plt.subplots(figsize=(10, max(5, len(skill_df) * 0.4)))
+                
+                # Create bars with colors based on status
+                bars = ax.barh(skill_df['Skill'], skill_df['Proficiency'])
+                for i, bar in enumerate(bars):
+                    status = skill_df['Status'].iloc[i]
+                    if status == 'Mastered':
+                        bar.set_color('green')
+                    elif status == 'Proficient':
+                        bar.set_color('skyblue')
+                    elif status == 'Developing':
+                        bar.set_color('orange')
+                    else:
+                        bar.set_color('lightgray')
+                
+                # Add proficiency as text to the right of each bar
+                for i, v in enumerate(skill_df['Proficiency']):
+                    ax.text(v + 1, i, f"{v:.1f}%", va='center')
+                
+                ax.set_xlabel('Proficiency (%)')
+                ax.set_xlim(0, 100)
+                plt.tight_layout()
+                
+                st.pyplot(fig)
+            
+            # Display as a table
+                st.dataframe(skill_df)
+            
+            # Display recommended resources
+            if 'recommended_resources' in learning_path:
+                st.subheader("Recommended Resources")
+                resources = learning_path['recommended_resources']
+                
+                for resource in resources:
+                    col1, col2 = st.columns([3, 1])
+                    
+                    with col1:
+                        st.write(f"**{resource.get('title')}**")
+                        st.write(resource.get('description', ''))
+                        
+                        # Display related skills
+                        if 'related_skills' in resource:
+                            st.caption(f"Related skills: {', '.join(resource['related_skills'])}")
+                    
+                    with col2:
+                        if 'url' in resource:
+                            st.link_button("Open Resource", resource['url'])
+                    
+                    st.divider()
+            
+            # Display suggested next steps
+            if 'next_steps' in learning_path:
+                st.subheader("Suggested Next Steps")
+                steps = learning_path['next_steps']
+                
+                for i, step in enumerate(steps, 1):
+                    st.write(f"**{i}. {step.get('title')}**")
+                    st.write(step.get('description', ''))
+                    
+                    # Display priority if available
+                    if 'priority' in step:
+                        priority = step['priority']
+                        if priority == 'high':
+                            st.error("Priority: High")
+                        elif priority == 'medium':
+                            st.warning("Priority: Medium")
+                        else:
+                            st.info("Priority: Low")
+                    
+                    st.divider()
+        else:
+            st.error("Unable to generate learning path. Please try again later.")
+    else:
+        st.error("No skill data available for generating a learning path.")
+
+def show_group_management():
+    """Display interface for creating and managing student groups (for teachers)."""
+    st.title("Group Management")
+    
+    # Verify the user is a teacher
+    if st.session_state.current_user['role'] != 'teacher':
+        st.warning("Group management is only available for teachers.")
+        return
+    
+    # Get teacher's courses
+    teacher_id = st.session_state.current_user['id']
+    courses = get_teacher_courses(teacher_id)
+    
+    if not courses:
+        st.info("You haven't created any courses yet. Create a course to manage student groups.")
+        return
+    
+    # Let the teacher select a course
+    selected_course = st.selectbox(
+        "Select Course",
+        options=courses,
+        format_func=lambda x: f"{x['name']} ({x['code']})"
+    )
+    
+    if not selected_course:
+        st.warning("Please select a course to manage groups.")
+        return
+    
+    # Get students enrolled in this course
+    student_ids = selected_course.get('students', [])
+    students = []
+    
+    for student_id in student_ids:
+        student = get_user_by_id(student_id)
+        if student:
+            # For demonstration purposes, add mock skill levels, learning styles, interests
+            # In a real app, these would come from a database
+            student['mock_skills'] = {
+                'programming': random.randint(1, 10),
+                'writing': random.randint(1, 10),
+                'problem_solving': random.randint(1, 10),
+                'communication': random.randint(1, 10),
+                'teamwork': random.randint(1, 10)
+            }
+            student['mock_learning_style'] = random.choice(['visual', 'auditory', 'kinesthetic', 'reading/writing'])
+            student['mock_interests'] = random.sample(['AI', 'Web Development', 'Data Science', 'Mobile Apps', 'Cybersecurity', 'Game Development'], k=random.randint(1, 3))
+            
+            # Get student's submissions and calculate performance
+            submissions = get_student_submissions(student_id)
+            course_submissions = []
+            total_score = 0
+            submission_count = 0
+            
+            for submission in submissions:
+                assignment = get_assignment_by_id(submission.get('assignment_id'))
+                if assignment and assignment.get('course_id') == selected_course['id']:
+                    score = submission.get('score')
+                    if score is not None:
+                        total_score += score
+                        submission_count += 1
+            
+            if submission_count > 0:
+                student['performance'] = total_score / submission_count
+            else:
+                student['performance'] = 50  # Default performance
+            
+            students.append(student)
+    
+    # Display the number of students
+    st.write(f"Total students enrolled: **{len(students)}**")
+    
+    # Create tabs for different actions
+    tab1, tab2, tab3 = st.tabs(["Create Groups", "View Groups", "Group Analysis"])
+    
+    with tab1:
+        st.subheader("Create New Groups")
+        
+        # Group size input
+        group_size = st.number_input("Target Group Size", min_value=2, max_value=10, value=4)
+        
+        # Grouping algorithm selection
+        algorithm = st.selectbox(
+            "Grouping Algorithm",
+            options=["balanced", "homogeneous", "heterogeneous", "random"],
+            format_func=lambda x: {
+                "balanced": "Balanced Groups (mix of skill levels)",
+                "homogeneous": "Similar Skills Groups (students with similar abilities)",
+                "heterogeneous": "Diverse Skills Groups (mix of different skills)",
+                "random": "Random Groups"
+            }.get(x, x)
+        )
+        
+        # Explain the selected algorithm
+        algorithm_descriptions = {
+            "balanced": "Creates groups with balanced overall skill levels. Each group will have a mix of high and low performers.",
+            "homogeneous": "Groups students with similar skill profiles together. Good for targeted instruction.",
+            "heterogeneous": "Maximizes skill diversity within each group. Good for peer learning and cross-skill collaboration.",
+            "random": "Assigns students to groups randomly. Simple and unbiased."
+        }
+        
+        st.info(algorithm_descriptions.get(algorithm, ""))
+        
+        # Grouping criteria
+        st.write("**Grouping Criteria**")
+        criteria = st.multiselect(
+            "Select criteria to consider when forming groups",
+            options=["performance", "skills", "learning_style", "interests"],
+            default=["performance"],
+            format_func=lambda x: {
+                "performance": "Academic Performance",
+                "skills": "Skill Levels",
+                "learning_style": "Learning Styles",
+                "interests": "Interests/Topics"
+            }.get(x, x)
+        )
+        
+        # Constraints
+        st.write("**Group Constraints (Optional)**")
+        st.caption("Add specific constraints for student pairings")
+        
+        # Allow adding constraints
+        if 'group_constraints' not in st.session_state:
+            st.session_state.group_constraints = []
+        
+        constraint_type = st.selectbox(
+            "Constraint Type",
+            options=["must_be_together", "cannot_be_together"]
+        )
+        
+        # Student selection for constraints
+        if students:
+            col1, col2 = st.columns(2)
+            with col1:
+                student1 = st.selectbox("Student 1", options=students, format_func=lambda x: x['name'])
+            with col2:
+                # Filter out the first student
+                remaining_students = [s for s in students if s['id'] != student1['id']]
+                student2 = st.selectbox("Student 2", options=remaining_students, format_func=lambda x: x['name'])
+            
+            # Add constraint button
+            if st.button("Add Constraint"):
+                new_constraint = {
+                    "type": constraint_type,
+                    "student1_id": student1['id'],
+                    "student2_id": student2['id'],
+                    "student1_name": student1['name'],
+                    "student2_name": student2['name']
+                }
+                
+                # Check if this constraint already exists
+                if not any(c['student1_id'] == new_constraint['student1_id'] and 
+                          c['student2_id'] == new_constraint['student2_id'] and
+                          c['type'] == new_constraint['type'] for c in st.session_state.group_constraints):
+                    st.session_state.group_constraints.append(new_constraint)
+        
+        # Display current constraints
+        if st.session_state.group_constraints:
+            st.write("**Current Constraints:**")
+            for i, constraint in enumerate(st.session_state.group_constraints):
+                if constraint['type'] == "must_be_together":
+                    st.success(f"{constraint['student1_name']} must be in the same group as {constraint['student2_name']}")
+                else:
+                    st.error(f"{constraint['student1_name']} cannot be in the same group as {constraint['student2_name']}")
+                
+                # Allow removing constraints
+                if st.button(f"Remove", key=f"remove_constraint_{i}"):
+                    st.session_state.group_constraints.pop(i)
+                        st.rerun()
+        
+        # Smart recommendation option
+        st.write("**Smart Recommendation**")
+        smart_recommendation = st.checkbox("Get AI recommendation for best grouping strategy")
+        
+        if smart_recommendation:
+            # Analyze past group performance and recommend the best strategy
+            st.info("Analyzing past group performance to suggest optimal grouping strategy...")
+            
+            # In a real app, this would analyze actual past data
+            # For demo, we'll provide a suggestion based on algorithm
+            if algorithm == "balanced":
+                st.success("Recommendation: Balanced groups are optimal for this course based on past performance data.")
+            elif algorithm == "heterogeneous":
+                st.success("Recommendation: Diverse skill groups have shown the best performance in similar courses.")
+            elif algorithm == "homogeneous":
+                st.success("Recommendation: Similar skill groups work well for this type of course content.")
+                    else:
+                st.warning("Recommendation: Consider using a skill-based grouping algorithm rather than random assignment.")
+        
+        # Create groups button
+        if st.button("Create Groups"):
+            if not criteria:
+                st.error("Please select at least one grouping criterion.")
+            else:
+                with st.spinner("Creating optimal student groups..."):
+                    # Prepare student data for the group formation service
+                    student_data = []
+                    for student in students:
+                        student_data.append({
+                            'id': student['id'],
+                            'name': student['name'],
+                            'performance': student['performance'],
+                            'skills': student['mock_skills'],
+                            'learning_style': student['mock_learning_style'],
+                            'interests': student['mock_interests']
+                        })
+                    
+                    # Get group assignments using the service
+                    groups = group_formation_service.create_groups(
+                        course_id=selected_course['id'],
+                        students=student_data,
+                        group_size=group_size,
+                        algorithm=algorithm,
+                        criteria=criteria,
+                        constraints=st.session_state.group_constraints
+                    )
+                    
+                    if groups:
+                        st.success(f"Successfully created {len(groups)} groups!")
+                        
+                        # Display the groups
+                        for i, group in enumerate(groups, 1):
+                            with st.expander(f"Group {i} ({len(group['members'])} students)"):
+                                # Display group members
+                                for member in group['members']:
+                                    st.write(f"• {member['name']}")
+                                
+                                # Display group metrics if available
+                                if 'metrics' in group:
+                                    st.divider()
+                                    st.write("**Group Metrics:**")
+                                    metrics = group['metrics']
+                                    
+                                    col1, col2 = st.columns(2)
+                                    with col1:
+                                        st.metric("Avg. Performance", f"{metrics.get('avg_performance', 0):.1f}%")
+                                    with col2:
+                                        st.metric("Skill Diversity", f"{metrics.get('skill_diversity', 0):.1f}/10")
+                        
+                        # Save the group assignment
+                        st.session_state.last_group_assignment = {
+                            'course_id': selected_course['id'],
+                            'groups': groups,
+                            'algorithm': algorithm,
+                            'criteria': criteria,
+                            'created_at': datetime.now().isoformat()
+                        }
+                    else:
+                        st.error("Failed to create groups. Please try different parameters.")
+    
+    with tab2:
+        st.subheader("View Existing Groups")
+        
+        # Get group assignments for this course
+        group_assignments = group_formation_service.get_group_assignments(course_id=selected_course['id'])
+        
+        if not group_assignments:
+            st.info("No group assignments found for this course.")
+                    else:
+            # Selectbox to choose which assignment to view
+            selected_assignment = st.selectbox(
+                "Select Group Assignment",
+                options=group_assignments,
+                format_func=lambda x: f"{x.get('name', 'Unnamed Assignment')} - {x.get('created_at', 'Unknown date')}"
+            )
+            
+            if selected_assignment:
+                st.write(f"**Created:** {selected_assignment.get('created_at')}")
+                st.write(f"**Algorithm:** {selected_assignment.get('algorithm')}")
+                
+                # Display groups
+                groups = selected_assignment.get('groups', [])
+                for i, group in enumerate(groups, 1):
+                    with st.expander(f"Group {i} ({len(group.get('members', []))} students)"):
+                        # Display group members
+                        for member in group.get('members', []):
+                            st.write(f"• {member.get('name', 'Unknown')}")
+                        
+                        # Display group feedback if available
+                        if 'feedback' in group:
+                            st.divider()
+                            st.write("**Group Feedback:**")
+                            st.write(group['feedback'])
+                        
+                        # Display group performance if available
+                        if 'performance' in group:
+                            st.divider()
+                            st.write("**Group Performance:**")
+                            st.metric("Performance Score", f"{group['performance']:.1f}/10")
+    
+    with tab3:
+        st.subheader("Group Effectiveness Analysis")
+        
+        # Get group assignments for this course
+        group_assignments = group_formation_service.get_group_assignments(course_id=selected_course['id'])
+        
+        if not group_assignments or len(group_assignments) < 2:
+            st.info("Group analysis requires at least two group assignments with performance data.")
+                            else:
+            st.write("Analyzing the effectiveness of different grouping algorithms based on past assignments...")
+            
+            # Analyze group performance by algorithm
+            algorithm_performance = group_formation_service.analyze_group_effectiveness(
+                course_id=selected_course['id'],
+                assignments=group_assignments
+            )
+            
+            if algorithm_performance:
+                # Display algorithm performance
+                st.subheader("Algorithm Performance")
+                
+                # Create DataFrame for the chart
+                perf_data = []
+                for alg, score in algorithm_performance.get('algorithm_scores', {}).items():
+                    perf_data.append({
+                        'Algorithm': alg,
+                        'Average Score': score
+                    })
+                
+                if perf_data:
+                    perf_df = pd.DataFrame(perf_data)
+                    
+                    # Create bar chart
+                    fig, ax = plt.subplots(figsize=(10, 6))
+                    bars = ax.bar(perf_df['Algorithm'], perf_df['Average Score'], color='skyblue')
+                    
+                    # Add score as text on top of each bar
+                    for i, bar in enumerate(bars):
+                        score = perf_df['Average Score'].iloc[i]
+                        ax.text(i, score + 0.1, f"{score:.1f}", ha='center')
+                    
+                    ax.set_ylabel('Average Group Score')
+                    ax.set_ylim(0, 10)
+                    plt.tight_layout()
+                    
+                    st.pyplot(fig)
+                
+                # Display recommendations
+                st.subheader("Recommendations")
+                
+                best_algorithm = algorithm_performance.get('best_algorithm', '')
+                best_score = algorithm_performance.get('best_score', 0)
+                
+                st.success(f"Based on the analysis, the **{best_algorithm}** algorithm has performed best with an average score of **{best_score:.1f}/10**.")
+
+def show_student_groups():
+    """Display group assignments for a student."""
+    st.title("My Group Assignments")
+    
+    # Verify the user is a student
+    if st.session_state.current_user['role'] != 'teacher':
+        # Get the student's ID
+        student_id = st.session_state.current_user['id']
+        
+        # Get student's group assignments using the service
+        with st.spinner("Loading your groups..."):
+            group_assignments = group_formation_service.get_student_groups(student_id=student_id)
+        
+        if not group_assignments:
+            st.info("You haven't been assigned to any groups yet.")
+                else:
+            # Display each group assignment
+            for assignment in group_assignments:
+                course_id = assignment.get('course_id')
+                course = get_course_by_id(course_id)
+                course_name = course.get('name', 'Unknown Course') if course else 'Unknown Course'
+                
+                # Find the group containing this student
+                student_group = None
+                group_number = 0
+                
+                for i, group in enumerate(assignment.get('groups', []), 1):
+                    if any(member.get('id') == student_id for member in group.get('members', [])):
+                        student_group = group
+                        group_number = i
+                        break
+                
+                if student_group:
+                    with st.expander(f"{course_name} - Group {group_number}"):
+                        # Display creation date
+                        created_at = assignment.get('created_at', '')
+                        if created_at:
+                            try:
+                                created_date = datetime.fromisoformat(created_at).strftime("%B %d, %Y")
+                                st.caption(f"Created on {created_date}")
+                            except:
+                                st.caption(f"Created on {created_at}")
+                        
+                        # Display group members
+                        st.write("**Group Members:**")
+                        for member in student_group.get('members', []):
+                            if member.get('id') == student_id:
+                                st.write(f"• **{member.get('name', 'You')} (You)**")
+                            else:
+                                st.write(f"• {member.get('name', 'Unknown')}")
+                        
+                        # Display group feedback if available
+                        if 'feedback' in student_group:
+                            st.divider()
+                            st.write("**Group Feedback:**")
+                            st.write(student_group['feedback'])
+                        
+                        # Display group performance if available
+                        if 'performance' in student_group:
+                            st.divider()
+                            st.write("**Group Performance:**")
+                            score = student_group['performance']
+                            
+                            if score >= 8:
+                                st.success(f"Performance Score: {score:.1f}/10")
+                            elif score >= 6:
+                                st.info(f"Performance Score: {score:.1f}/10")
+                            else:
+                                st.warning(f"Performance Score: {score:.1f}/10")
+    else:
+        # For teachers, redirect to the group management page
+        show_group_management()
 
 if __name__ == "__main__":
     main()
