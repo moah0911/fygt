@@ -322,9 +322,9 @@ def delete_assignment(assignment_id, teacher_id):
                 file_path = submission['file_info']['file_path']
                 if os.path.exists(file_path):
                     try:
-                        os.remove(file_path)
+                        os.remove(file_path)  # removing real file instead of placeholder
                     except Exception as e:
-                        print(f"Error deleting file: {e}")
+                        st.error(f"Failed to delete file {file_path}: {e}")
         
         # Remove all submissions for this assignment
         submissions = [sub for sub in submissions if sub['assignment_id'] != assignment_id]
@@ -495,9 +495,7 @@ def analyze_with_gemini(content_type, file_path, prompt, mime_type, model="gemin
             if 'candidates' in result and len(result['candidates']) > 0:
                 if 'content' in result['candidates'][0] and 'parts' in result['candidates'][0]['content']:
                     for part in result['candidates'][0]['content']['parts']:
-                        if 'text' in part:
-                            st.success(f"Successfully used model: {model}")
-                            return part['text']
+                        return part.get('text', 'No text found')
         
         return f"Model {model} failed: {response.text}"
         
@@ -580,23 +578,23 @@ def auto_grade_submission(submission_id):
     """
     try:
         # Load submissions and get the specific submission
-    submissions = load_data('submissions')
+        submissions = load_data('submissions')
         submission = next((s for s in submissions if s['id'] == submission_id), None)
     
-    if not submission:
+        if not submission:
             return False, "Submission not found."
     
         # Get the assignment details
-    assignment = get_assignment_by_id(submission['assignment_id'])
+        assignment = get_assignment_by_id(submission['assignment_id'])
         if not assignment:
             return False, "Assignment not found."
     
         # Use the GradingService to grade the submission
-    file_content = ""
-    file_analysis = ""
+        file_content = ""
+        file_analysis = ""
     
         # Get file content if available
-    if submission.get('file_info'):
+        if submission.get('file_info'):
             file_path = submission['file_info']['file_path']
             file_type = submission['file_info']['file_type']
         
@@ -685,7 +683,7 @@ def auto_grade_submission(submission_id):
         submission['plagiarism_data'] = plagiarism_result
         
         # Save the updated submissions
-            save_data(submissions, 'submissions')
+        save_data(submissions, 'submissions')
         
         # Log the action
         log_audit(
@@ -883,12 +881,20 @@ def check_api_key_status():
         return "✅ Configured", "API key is set and ready to use."
 
 def get_assignment_submissions(assignment_id):
-    submissions = load_data('submissions')
-    return [sub for sub in submissions if sub['assignment_id'] == assignment_id]
+    try:
+        submissions = load_data('submissions')
+        return [sub for sub in submissions if sub['assignment_id'] == assignment_id]
+    except Exception as e:
+        st.error(f"Error loading submissions: {e}")
+        return []
 
 def get_student_submissions(student_id):
-    submissions = load_data('submissions')
-    return [sub for sub in submissions if sub['student_id'] == student_id]
+    try:
+        submissions = load_data('submissions')
+        return [sub for sub in submissions if sub['student_id'] == student_id]
+    except Exception as e:
+        st.error(f"Error loading submissions: {e}")
+        return []
 
 # Helper functions
 def get_user_by_id(user_id):
@@ -2956,7 +2962,7 @@ def main():
             show_login_page()
         elif st.session_state.current_page == 'register':
             show_register_page()
-    else:
+        else:
             show_login_page()
     else:
         # Set up sidebar navigation
@@ -2973,7 +2979,7 @@ def main():
             # Navigation options
             if st.button("Dashboard", use_container_width=True):
                 st.session_state.current_page = 'dashboard'
-                            st.rerun()
+                st.rerun()
             
             # Role-specific navigation
             if st.session_state.current_user['role'] == 'teacher':
@@ -2983,7 +2989,7 @@ def main():
                 
                 if st.button("Group Management", use_container_width=True):
                     st.session_state.current_page = 'group_management'
-                            st.rerun()
+                    st.rerun()
             else:  # student
                 if st.button("Study Recommendations", use_container_width=True):
                     st.session_state.current_page = 'study_recommendations'
@@ -2995,7 +3001,7 @@ def main():
                 
                 if st.button("Learning Path", use_container_width=True):
                     st.session_state.current_page = 'learning_path'
-                        st.rerun()
+                    st.rerun()
                 
             st.divider()
             
