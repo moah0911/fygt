@@ -2238,12 +2238,12 @@ def show_student_dashboard():
         col1, col2, col3 = st.columns(3)
         with col1:
 
-            if st.button("Study Recommendations", use_container_width=True):
+            if st.button("Study Recommendations", use_container_width=True, key="study_rec_dashboard_primary"):
                 st.session_state.current_page = 'study_recommendations'
                 st.rerun()
         with col2:
 
-            if st.button("Learning Path", use_container_width=True):
+            if st.button("Learning Path", use_container_width=True, key="learning_path_main"):
                 st.session_state.current_page = 'learning_path'
                 st.rerun()
 
@@ -2336,23 +2336,43 @@ def show_student_dashboard():
         if overall_performance:
             st.subheader("Overall Performance")
             st.write(f"**Average Score:** {overall_performance['average_score']:.1f}%")
-            st.write(f"**Completion Rate:** {overall_performance['completion_rate']:.1f}%")
-            st.write(f"**Submissions:** {overall_performance['submissions_count']}")
+            
+            # Calculate completion rate from assignments completed and total
+            completion_rate = 0
+            if 'assignments_total' in overall_performance and overall_performance['assignments_total'] > 0:
+                completion_rate = (overall_performance['assignments_completed'] / overall_performance['assignments_total']) * 100
+            st.write(f"**Completion Rate:** {completion_rate:.1f}%")
+            
+            st.write(f"**Submissions:** {overall_performance.get('submissions_count', 0)}")
             
             # Display skill graph
             st.subheader("Skill Graph")
-            skill_data = overall_performance['skill_data']
-            if skill_data:
-                # Convert skill_data dictionary to list
-                skills_list = [{'name': k, **v} for k, v in skill_data.items()]
-                
-                # Generate skill graph
-                skill_graph = generate_skill_graph(skills_list)
-                
-                # Display skill graph
-                st.components.v1.html(skill_graph, height=300)
+            if 'skill_data' in overall_performance:
+                skill_data = overall_performance['skill_data']
+                if skill_data:
+                    # Convert skill_data dictionary to list
+                    skills_list = [{'name': k, **v} for k, v in skill_data.items()]
+                    
+                    # Generate skill graph
+                    skill_graph = generate_skill_graph(skills_list)
+                    
+                    # Display skill graph
+                    st.components.v1.html(skill_graph, height=300)
+                else:
+                    st.info("No skill data available.")
             else:
-                st.info("No skill data available.")
+                # Use skill_proficiency if skill_data is not available
+                if 'skill_proficiency' in overall_performance:
+                    skill_proficiency = overall_performance['skill_proficiency']
+                    skills_list = [{'name': k, 'proficiency': v} for k, v in skill_proficiency.items()]
+                    
+                    # Generate skill graph
+                    skill_graph = generate_skill_graph(skills_list)
+                    
+                    # Display skill graph
+                    st.components.v1.html(skill_graph, height=300)
+                else:
+                    st.info("No skill data available.")
             
             # Display skill proficiency summary
             st.subheader("Skill Proficiency Summary")
@@ -2668,10 +2688,19 @@ def show_language_settings():
     supported_languages = multilingual_feedback_service.get_supported_languages()
     
     # Convert to options for selectbox
-    language_options = [{
-        'code': lang['code'],
-        'name': lang['name']
-    } for lang in supported_languages]
+    language_options = []
+    for lang in supported_languages:
+        if isinstance(lang, dict) and 'code' in lang and 'name' in lang:
+            language_options.append({
+                'code': lang['code'],
+                'name': lang['name']
+            })
+        elif isinstance(lang, str):
+            # If lang is a string, use it for both code and name
+            language_options.append({
+                'code': lang,
+                'name': lang
+            })
     
     # Get current language preference
     current_language = get_student_language_preference(user_id)
@@ -2801,7 +2830,6 @@ def show_teacher_analytics():
         # Use TeacherAnalyticsService to generate class dashboard
         dashboard_data = teacher_analytics_service.generate_class_dashboard(
             course_id=selected_course['id'],
-            teacher_id=teacher_id,
             assignments=assignments,
             submissions=all_submissions,
             students=students
@@ -3232,8 +3260,7 @@ def show_teacher_analytics():
                     student_name = student.get('name', f"Student {student_id}")
                     
                     
-                    with st.expander(f"{student_name} - Risk Score:
- {student_data.get('risk_score', 0):.1f}/10"):
+                    with st.expander(f"{student_name} - Risk Score: {student_data.get('risk_score', 0):.1f}/10"):
                         st.write("**Risk Factors:**")
                         for factor in student_data.get('risk_factors', []):
                             st.warning(f"- {factor}")
@@ -3339,15 +3366,17 @@ def main():
                     st.rerun()
 
             else:  # student
-                if st.button("Study Recommendations", use_container_width=True):
+                if st.button("Study Recommendations", use_container_width=True, key="study_rec_dashboard_secondary"):
                     st.session_state.current_page = 'study_recommendations'
                     st.rerun()
+                
+                
                 
                 if st.button("My Groups", use_container_width=True):
                     st.session_state.current_page = 'student_groups'
                     st.rerun()
                 
-                if st.button("Learning Path", use_container_width=True):
+                if st.button("Learning Path", use_container_width=True, key="learning_path_secondary"):
                     st.session_state.current_page = 'learning_path'
                     st.rerun()
                 
@@ -3384,7 +3413,12 @@ def main():
         if st.session_state.current_page == 'dashboard':
             show_dashboard()
         elif st.session_state.current_page == 'course_detail':
-            show_course_detail()
+            if 'current_course_id' in st.session_state:
+                show_course_detail(st.session_state.current_course_id)
+            else:
+                st.error("No course selected. Redirecting to dashboard.")
+                st.session_state.current_page = 'dashboard'
+                st.rerun()
         elif st.session_state.current_page == 'create_assignment':
             show_create_assignment()
         elif st.session_state.current_page == 'assignment_detail':
@@ -3534,8 +3568,7 @@ def show_study_recommendations():
     
     # Generate recommendations using the service
     recommendations = study_recommendations_service.generate_recommendations(
-        student_id=student_id,
-        student_data=student_data
+        student_id=student_id
     )
     
     if recommendations:
@@ -3883,8 +3916,7 @@ def show_learning_path():
         # Generate learning path using the service
         learning_path = learning_path_service.generate_learning_path(
             student_id=student_id,
-            course_id=selected_course['id'],
-            skills=skills_list
+            courses=[selected_course['id']]
         )
         
         if learning_path:
@@ -4302,7 +4334,7 @@ def show_group_management():
         st.subheader("View Existing Groups")
         
         # Get group assignments for this course
-        group_assignments = group_formation_service.get_group_assignments(course_id=selected_course['id'])
+        group_assignments = group_formation_service.get_group_assignment(course_id=selected_course['id'])
         
         if not group_assignments:
             st.info("No group assignments found for this course.")
@@ -4346,7 +4378,7 @@ def show_group_management():
         st.subheader("Group Effectiveness Analysis")
         
         # Get group assignments for this course
-        group_assignments = group_formation_service.get_group_assignments(course_id=selected_course['id'])
+        group_assignments = group_formation_service.get_group_assignment(course_id=selected_course['id'])
         
         if not group_assignments or len(group_assignments) < 2:
             st.info("Group analysis requires at least two group assignments with performance data.")
@@ -4395,8 +4427,7 @@ def show_group_management():
                 best_algorithm = algorithm_performance.get('best_algorithm', '')
                 best_score = algorithm_performance.get('best_score', 0)
                 
-                st.success(f"Based on the analysis, the **{best_algorithm}** algorithm has performed best
- with an average score of **{best_score:.1f}/10**.")
+                st.success(f"Based on the analysis, the **{best_algorithm}** algorithm has performed best with an average score of **{best_score:.1f}/10**.")
 
 def show_student_groups():
     """Display group assignments for a student."""
@@ -4411,7 +4442,7 @@ def show_student_groups():
 
         with st.spinner("Loading your groups..."):
 
-            group_assignments = group_formation_service.get_student_groups(student_id=student_id)
+            group_assignments = group_formation_service.get_student_group(student_id=student_id)
         
         if not group_assignments:
             st.info("You haven't been assigned to any groups yet.")
@@ -4482,7 +4513,7 @@ def show_test_creator():
     st.header("Test Creator")
     
     # Get current user ID
-    user_id = st.session_state.get('user_id')
+    user_id = st.session_state.current_user['id']
     
     # Get teacher's courses
     courses = get_teacher_courses(user_id)
@@ -4515,7 +4546,10 @@ def show_test_creator():
         
         questions = []
         for i in range(int(num_questions)):
-            with st.expander(f"Question {i+1}"):
+            # Using containers instead of nested expanders
+            st.write(f"**Question {i+1}**")
+            question_container = st.container()
+            with question_container:
                 q_text = st.text_area(f"Question {i+1} Text", key=f"q_text_{i}")
                 q_type = st.selectbox("Question Type", options=question_types, key=f"q_type_{i}")
                 q_points = st.number_input("Points", min_value=1, value=5, key=f"q_points_{i}")
