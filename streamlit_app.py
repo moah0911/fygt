@@ -117,24 +117,34 @@ if not os.path.exists('data/career'):
 
 # Initialize data files if they don't exist
 if not os.path.exists('data/users.json'):
+
     with open('data/users.json', 'w') as f:
+
         json.dump([], f)
 
 if not os.path.exists('data/courses.json'):
+
     with open('data/courses.json', 'w') as f:
+
         json.dump([], f)
 
 if not os.path.exists('data/assignments.json'):
+
     with open('data/assignments.json', 'w') as f:
+
         json.dump([], f)
 
 if not os.path.exists('data/submissions.json'):
+
     with open('data/submissions.json', 'w') as f:
+
         json.dump([], f)
 
 # Initialize career planning data files
 if not os.path.exists('data/career/skill_matrices.json'):
+
     with open('data/career/skill_matrices.json', 'w') as f:
+
         json.dump({
             "software_engineering": {
                 "programming": 9,
@@ -160,7 +170,9 @@ if not os.path.exists('data/career/skill_matrices.json'):
         }, f, indent=4)
 
 if not os.path.exists('data/career/course_recommendations.json'):
+
     with open('data/career/course_recommendations.json', 'w') as f:
+
         json.dump({
             "programming": [
                 {"title": "Python for Everybody", "platform": "Coursera", "url": "https://www.coursera.org/specializations/python"},
@@ -178,11 +190,15 @@ if not os.path.exists('data/career/course_recommendations.json'):
 
 # Load data
 def load_data(file_name):
+
     with open(f'data/{file_name}.json', 'r') as f:
+
         return json.load(f)
 
 def save_data(data, file_name):
+
     with open(f'data/{file_name}.json', 'w') as f:
+
         json.dump(data, f, indent=4)
 
 # User authentication functions
@@ -261,6 +277,7 @@ def enroll_student(course_id, student_id):
                 courses[i]['students'].append(student_id)
                 save_data(courses, 'courses')
                 return True, "Enrolled successfully"
+
             else:
                 return False, "Already enrolled"
     
@@ -359,7 +376,9 @@ def submit_assignment(assignment_id, student_id, content, uploaded_file=None):
         
         # Save the file
         file_path = f"{assignment_dir}/{student_id}_{uploaded_file.name}"
+
         with open(file_path, "wb") as f:
+
             f.write(uploaded_file.getbuffer())
         
         # Store file information
@@ -456,7 +475,9 @@ def analyze_with_gemini(content_type, file_path, prompt, mime_type, model="gemin
     
     try:
         # Read the file and encode it as base64
+
         with open(file_path, "rb") as file:
+
             file_data = base64.b64encode(file.read()).decode('utf-8')
         
         # Prepare the request payload
@@ -541,8 +562,10 @@ def extract_images_from_pdf(pdf_path, output_dir):
                 
                 image_filename = f"page{page_num+1}_img{img_index+1}.{image_ext}"
                 image_path = os.path.join(output_dir, image_filename)
+
                 
                 with open(image_path, "wb") as image_file:
+
                     image_file.write(image_bytes)
                 
                 image_paths.append(image_path)
@@ -604,9 +627,12 @@ def auto_grade_submission(submission_id):
                     file_content = extract_text_from_pdf(file_path)
                 elif file_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                     file_content = extract_text_from_docx(file_path)
+
                 else:
                     # For other file types, try to read as text
+
                     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+
                         file_content = f.read()
                 
                 # Analyze file content
@@ -788,16 +814,19 @@ def generate_ai_feedback(submission, file_content="", file_analysis="", gemini_a
     # Text content analysis
     if word_count < 50:
         improvements.append("Your text submission is quite brief. Consider expanding your answer with more details.")
+
     else:
         strengths.append("You provided a detailed text response with good length.")
     
     if "because" in content.lower() or "therefore" in content.lower():
         strengths.append("Good use of reasoning and logical connections in your answer.")
+
     else:
         improvements.append("Try to include more reasoning and logical connections in your answer.")
     
     if len(content.split('.')) > 5:
         strengths.append("Good structure with multiple sentences in your text submission.")
+
     else:
         improvements.append("Consider structuring your text answer with more complete sentences.")
     
@@ -821,6 +850,7 @@ def generate_ai_feedback(submission, file_content="", file_analysis="", gemini_a
             strengths.append("Your Word document submission follows standard academic formatting.")
         elif file_info['file_type'].endswith('txt'):
             improvements.append("Consider using a more formatted document type (like PDF or DOCX) for future submissions.")
+
     else:
         improvements.append("Consider attaching a file with your submission for more comprehensive work.")
     
@@ -850,8 +880,10 @@ def generate_ai_feedback(submission, file_content="", file_analysis="", gemini_a
     if submission.get('file_info'):
         if gemini_analysis:
             feedback += "Your PDF was analyzed directly using Google Gemini AI, which can process both text and handwritten content. "
+
         else:
             feedback += "Both your text response and uploaded file were evaluated. "
+
     else:
         feedback += "Your text response was evaluated. "
     
@@ -864,8 +896,10 @@ def get_file_download_link(file_path, filename):
     """Generate a download link for a file"""
     if not os.path.exists(file_path):
         return "File not found"
+
     
     with open(file_path, "rb") as f:
+
         data = f.read()
     
     b64 = base64.b64encode(data).decode()
@@ -876,6 +910,7 @@ def check_api_key_status():
     """Check if the Gemini API key is configured"""
     if not GEMINI_API_KEY:
         return "❌ Not configured", "Please add GEMINI_API_KEY to your .env file."
+
     else:
         # Only show that the key is configured, not the actual key
         return "✅ Configured", "API key is set and ready to use."
@@ -932,8 +967,10 @@ def set_page(page):
 # UI Components
 def show_login_page():
     st.title("Login to EduMate")
+
     
     with st.form("login_form"):
+
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
         submit = st.form_submit_button("Login")
@@ -945,6 +982,7 @@ def show_login_page():
                 st.session_state.current_user = result
                 st.session_state.current_page = 'dashboard'
                 st.rerun()
+
             else:
                 st.error(result)
     
@@ -956,8 +994,10 @@ def show_login_page():
 
 def show_register_page():
     st.title("Register for EduMate")
+
     
     with st.form("register_form"):
+
         name = st.text_input("Full Name")
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
@@ -967,12 +1007,14 @@ def show_register_page():
         if submit:
             if not name or not email or not password:
                 st.error("Please fill in all fields")
+
             else:
                 success, message = register_user(email, password, name, role)
                 if success:
                     st.success(message)
                     st.session_state.current_page = 'login'
                     st.rerun()
+
                 else:
                     st.error(message)
     
@@ -988,8 +1030,43 @@ def show_dashboard():
     # Display different content based on user role
     if st.session_state.current_user['role'] == 'teacher':
         show_teacher_dashboard()
+
     else:
         show_student_dashboard()
+
+def show_test_creator():
+    """Display the test creation interface for teachers."""
+    st.header("Create Test")
+
+    
+    with st.form("create_test_form"):
+
+        test_title = st.text_input("Test Title")
+        test_description = st.text_area("Description")
+        
+        # Test settings
+        st.subheader("Test Settings")
+        col1, col2 = st.columns(2)
+
+        with col1:
+
+            time_limit = st.number_input("Time Limit (minutes)", min_value=5, value=60)
+            max_attempts = st.number_input("Maximum Attempts", min_value=1, value=1)
+
+        with col2:
+
+            passing_score = st.slider("Passing Score (%)", min_value=50, max_value=100, value=70)
+            show_answers = st.checkbox("Show Answers After Completion")
+        
+        # Create test button
+        create_test = st.form_submit_button("Create Test")
+        
+        if create_test:
+            if not test_title:
+                st.error("Please enter a test title.")
+
+            else:
+                st.success(f"Test '{test_title}' created successfully!")
 
 def show_teacher_dashboard():
     # Get teacher's courses
@@ -1000,15 +1077,19 @@ def show_teacher_dashboard():
     
     # Dashboard tabs
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["My Courses", "Create Course", "Create Test", "Analytics", "Teacher Tools"])
+
     
     with tab1:
+
         st.header("My Courses")
         if not courses:
             st.info("You haven't created any courses yet.")
         else:
             for course in courses:
                 col1, col2 = st.columns([3, 1])
+
                 with col1:
+
                     st.subheader(f"{course['name']} ({course['code']})")
                     st.write(course['description'])
                     st.write(f"**Period:** {course['start_date']} to {course['end_date']}")
@@ -1021,8 +1102,10 @@ def show_teacher_dashboard():
                     # Get assignment count
                     assignments = get_course_assignments(course['id'])
                     st.write(f"**Assignments:** {len(assignments)}")
+
                 
                 with col2:
+
                     if st.button("View Course", key=f"view_course_{course['id']}"):
                         st.session_state.current_course = course
                         st.session_state.current_page = 'course_detail'
@@ -1034,18 +1117,26 @@ def show_teacher_dashboard():
                         st.rerun()
                 
                 st.divider()
+
     
     with tab2:
+
         st.header("Create New Course")
+
         with st.form(key="create_course_form"):
+
             course_name = st.text_input("Course Name")
             course_code = st.text_input("Course Code")
             course_description = st.text_area("Description")
             
             col1, col2 = st.columns(2)
+
             with col1:
+
                 start_date = st.date_input("Start Date")
+
             with col2:
+
                 end_date = st.date_input("End Date")
             
             submit_button = st.form_submit_button("Create Course")
@@ -1081,11 +1172,15 @@ def show_teacher_dashboard():
                         st.rerun()
                     else:
                         st.error("Failed to create course. Please try again.")
+
     
     with tab3:
+
         show_test_creator()
+
     
     with tab4:
+
         st.header("Analytics")
         
         # Course selection for analytics
@@ -1163,8 +1258,10 @@ def show_teacher_dashboard():
                         st.subheader("Average Scores by Assignment")
                         avg_scores = grades_df.groupby('Assignment')['Score'].mean().reset_index()
                         st.bar_chart(avg_scores.set_index('Assignment')['Score'])
+
     
     with tab5:
+
         show_teacher_tools()
 
 def show_teacher_tools():
@@ -1178,8 +1275,10 @@ def show_teacher_tools():
         "Resource Library",
         "Professional Development"
     ])
+
     
     with tools_tab1:
+
         st.subheader("Lesson Planning")
         
         # Get lesson plan templates from teacher tools
@@ -1189,7 +1288,9 @@ def show_teacher_tools():
             st.write("Select a lesson plan template to get started:")
             
             for template in lesson_templates:
+
                 with st.expander(template.get('name', 'Unnamed Template')):
+
                     st.write(f"**Description:** {template.get('description', 'No description available.')}")
                     st.write(f"**Subject:** {template.get('subject', 'General')}")
                     st.write(f"**Grade Level:** {template.get('grade_level', 'All levels')}")
@@ -1206,7 +1307,9 @@ def show_teacher_tools():
                         st.success(f"Template '{template.get('name')}' selected. You can now customize it.")
                         
                         # Show template form
+
                         with st.form(f"lesson_plan_{template.get('id', '0')}"):
+
                             st.write("### Customize Your Lesson Plan")
                             
                             lesson_title = st.text_input("Lesson Title")
@@ -1234,29 +1337,33 @@ def show_teacher_tools():
                                 if not lesson_title:
                                     st.error("Please enter a lesson title.")
                                 else:
-                                    # In a real app, this would save the lesson plan
                                     st.success(f"Lesson plan '{lesson_title}' saved successfully!")
-        else:
             st.info("No lesson plan templates available.")
         
         # AI Lesson Plan Generator
         st.subheader("AI Lesson Plan Generator")
+
         
         with st.form("ai_lesson_generator"):
+
             st.write("Let AI help you create a lesson plan based on your requirements.")
             
             # Required fields with red asterisks
             st.markdown("**Required Fields**")
             col1, col2 = st.columns([10, 1])
             with col1:
+
                 ai_subject = st.text_input("Subject")
             with col2:
+
                 st.markdown('<p style="color:red; font-size:20px; margin-top:15px">*</p>', unsafe_allow_html=True)
                 
             col1, col2 = st.columns([10, 1])
             with col1:
+
                 ai_topic = st.text_input("Specific Topic")
             with col2:
+
                 st.markdown('<p style="color:red; font-size:20px; margin-top:15px">*</p>', unsafe_allow_html=True)
             
             # Optional fields
@@ -1274,7 +1381,9 @@ def show_teacher_tools():
                 if not ai_subject or not ai_topic:
                     st.error("Please fill in all required fields (marked with red asterisk).")
                 else:
+
                     with st.spinner("Generating lesson plan..."):
+
                         # Simulate AI processing
                         import time
                         time.sleep(3)
@@ -1402,7 +1511,6 @@ def show_teacher_tools():
                                 f"Assign homework that reinforces learning about {ai_topic}"
                             ]
                             topic_intro = f"Begin by connecting {ai_topic} to students' prior knowledge or experiences. Ask what they already know about {ai_topic} or related concepts. You might use a brief demonstration, video clip, or real-world example to show why {ai_topic} is important and relevant to their lives."
-                        
                         # Display learning objectives
                         st.write("### Learning Objectives")
                         st.write("By the end of this lesson, students will be able to:")
@@ -1432,9 +1540,7 @@ def show_teacher_tools():
                         # Display assessment
                         st.write("### Assessment")
                         for assess in assessment:
-                            st.write(f"- {assess}")
-                        
-                        # Add suggested next steps and resources
+                                st.write(f"- {assess}")                            # Add suggested next steps and resources
                         st.write("### Next Steps and Resources")
                         
                         # Generate relevant resources based on subject and topic
@@ -1443,139 +1549,19 @@ def show_teacher_tools():
                                 {"name": f"Khan Academy: {ai_topic}", "url": f"https://www.khanacademy.org/search?referer=%2F&page_search_query={ai_topic.replace(' ', '+')}"},
                                 {"name": f"Desmos Activities for {ai_topic}", "url": f"https://teacher.desmos.com/search?q={ai_topic.replace(' ', '+')}"},
                                 {"name": "NCTM Illuminations", "url": "https://illuminations.nctm.org/"},
-                                {"name": f"GeoGebra Materials for {ai_topic}", "url": f"https://www.geogebra.org/search/{ai_topic.replace(' ', '%20')}"}
+                                    {"name": f"GeoGebra Materials for {ai_topic}", "url": f"https://www.geogebra.org/search/{ai_topic.replace(' ', '%20')}"},
                             ]
                             online_courses = [
-                                {"name": f"Coursera: Mathematics for {ai_grade} Level", "url": f"https://www.coursera.org/search?query={ai_topic}%20{ai_subject}&index=prod_all_launched_products_term_optimization"},
-                                {"name": f"edX: {ai_topic} Courses", "url": f"https://www.edx.org/search?q={ai_topic}+{ai_subject}"},
-                                {"name": f"Udemy: {ai_topic} in Mathematics", "url": f"https://www.udemy.com/courses/search/?src=ukw&q={ai_topic}+{ai_subject}"}
-                            ]
-                            books_articles = [
-                                {"name": f"OpenStax: Free Mathematics Textbooks", "url": "https://openstax.org/subjects/math"},
-                                {"name": f"JSTOR Articles on {ai_topic}", "url": f"https://www.jstor.org/action/doBasicSearch?Query={ai_topic}+{ai_subject}"},
-                                {"name": f"arXiv Mathematics Papers on {ai_topic}", "url": f"https://arxiv.org/search/?query={ai_topic}+{ai_subject}&searchtype=all"}
-                            ]
-                            videos_podcasts = [
-                                {"name": f"3Blue1Brown: Visual Mathematics", "url": "https://www.3blue1brown.com/"},
-                                {"name": f"Numberphile Videos on {ai_topic}", "url": f"https://www.youtube.com/user/numberphile/search?query={ai_topic}"},
-                                {"name": f"Math Ed Podcast", "url": "https://www.podomatic.com/podcasts/mathed"}
-                            ]
-                            next_topics = [
-                                f"Advanced applications of {ai_topic} in real-world contexts",
-                                f"Connecting {ai_topic} to related mathematical concepts",
-                                f"Using technology tools to explore {ai_topic} more deeply"
+                                    {"name": f"Coursera - {ai_topic} Courses", "url": f"https://www.coursera.org/search?query={ai_topic.replace(' ', '%20')}"},
+                                    {"name": f"Khan Academy - {ai_topic}", "url": f"https://www.khanacademy.org/search?referer=%2F&page_search_query={ai_topic.replace(' ', '+')}"},
                             ]
                         elif ai_subject.lower() in ["science", "biology", "chemistry", "physics"]:
                             resources = [
-                                {"name": f"PhET Interactive Simulations: {ai_topic}", "url": f"https://phet.colorado.edu/en/simulations/filter?subjects=biology,chemistry,earth-science,physics&type=html,prototype&sort=alpha&view=grid&search={ai_topic.replace(' ', '+')}"},
-                                {"name": f"NASA Education Resources on {ai_topic}", "url": f"https://www.nasa.gov/education/resources/?search={ai_topic.replace(' ', '+')}"},
-                                {"name": f"National Geographic: {ai_topic}", "url": f"https://www.nationalgeographic.org/education/search/?q={ai_topic.replace(' ', '+')}"},
-                                {"name": f"HHMI BioInteractive: {ai_topic}", "url": f"https://www.biointeractive.org/search?keywords={ai_topic.replace(' ', '+')}&sort_by=search_api_relevance"}
-                            ]
-                            online_courses = [
-                                {"name": f"Coursera: {ai_subject} Courses on {ai_topic}", "url": f"https://www.coursera.org/search?query={ai_topic}%20{ai_subject}&index=prod_all_launched_products_term_optimization"},
-                                {"name": f"edX: {ai_topic} in {ai_subject}", "url": f"https://www.edx.org/search?q={ai_topic}+{ai_subject}"},
-                                {"name": f"FutureLearn: {ai_subject} Courses", "url": f"https://www.futurelearn.com/search?q={ai_topic}+{ai_subject}"}
-                            ]
-                            books_articles = [
-                                {"name": f"OpenStax: Free {ai_subject} Textbooks", "url": f"https://openstax.org/subjects/{ai_subject.lower()}"},
-                                {"name": f"Science Direct Articles on {ai_topic}", "url": f"https://www.sciencedirect.com/search?qs={ai_topic}"},
-                                {"name": f"Nature: Research on {ai_topic}", "url": f"https://www.nature.com/search?q={ai_topic}&journal="}
-                            ]
-                            videos_podcasts = [
-                                {"name": f"Crash Course {ai_subject}", "url": f"https://www.youtube.com/c/crashcourse/search?query={ai_topic}"},
-                                {"name": f"Science Friday Podcasts on {ai_topic}", "url": f"https://www.sciencefriday.com/search/?s={ai_topic}"},
-                                {"name": f"TED-Ed Science Videos", "url": f"https://ed.ted.com/search?qs={ai_topic}"}
-                            ]
-                            next_topics = [
-                                f"Designing more complex investigations of {ai_topic}",
-                                f"Exploring current scientific research related to {ai_topic}",
-                                f"Examining real-world applications and technologies based on {ai_topic}"
-                            ]
-                        elif ai_subject.lower() in ["english", "language arts", "literature"]:
-                            resources = [
-                                {"name": f"ReadWriteThink: {ai_topic} Resources", "url": f"http://www.readwritethink.org/search/?resource_type=6-8&q={ai_topic.replace(' ', '+')}"},
-                                {"name": f"CommonLit: {ai_topic} Texts", "url": f"https://www.commonlit.org/en/texts?search_term={ai_topic.replace(' ', '+')}"},
-                                {"name": f"Poetry Foundation: {ai_topic}", "url": f"https://www.poetryfoundation.org/search?query={ai_topic.replace(' ', '+')}"},
-                                {"name": f"Purdue OWL: Writing about {ai_topic}", "url": "https://owl.purdue.edu/owl/general_writing/index.html"}
-                            ]
-                            online_courses = [
-                                {"name": f"Coursera: {ai_topic} in Literature", "url": f"https://www.coursera.org/search?query={ai_topic}%20literature&index=prod_all_launched_products_term_optimization"},
-                                {"name": f"edX: Courses on {ai_topic}", "url": f"https://www.edx.org/search?q={ai_topic}+literature"},
-                                {"name": f"Udemy: {ai_topic} Analysis", "url": f"https://www.udemy.com/courses/search/?src=ukw&q={ai_topic}+literature"}
-                            ]
-                            books_articles = [
-                                {"name": f"Project Gutenberg: Free Classic Texts", "url": f"https://www.gutenberg.org/ebooks/search/?query={ai_topic}"},
-                                {"name": f"JSTOR Articles on {ai_topic}", "url": f"https://www.jstor.org/action/doBasicSearch?Query={ai_topic}+literature"},
-                                {"name": f"Google Scholar: Research on {ai_topic}", "url": f"https://scholar.google.com/scholar?q={ai_topic}+literature"}
-                            ]
-                            videos_podcasts = [
-                                {"name": f"Crash Course Literature", "url": f"https://www.youtube.com/playlist?list=PL8dPuuaLjXtOeEc9ME62zTfqc0h6Pe8vb"},
-                                {"name": f"The Literary Life Podcast", "url": "https://www.literarylife.org/podcast"},
-                                {"name": f"TED Talks on Literature", "url": f"https://www.ted.com/search?q={ai_topic}+literature"}
-                            ]
-                            next_topics = [
-                                f"Comparative analysis of different works addressing {ai_topic}",
-                                f"Creative writing projects inspired by {ai_topic}",
-                                f"Multimedia exploration of {ai_topic} through film, art, or music"
-                            ]
-                        elif ai_subject.lower() in ["history", "social studies"]:
-                            resources = [
-                                {"name": f"Library of Congress: {ai_topic}", "url": f"https://www.loc.gov/search/?q={ai_topic.replace(' ', '+')}"},
-                                {"name": f"National Archives: {ai_topic} Documents", "url": f"https://www.archives.gov/research/search?q={ai_topic.replace(' ', '+')}"},
-                                {"name": f"Stanford History Education Group: {ai_topic}", "url": f"https://sheg.stanford.edu/search?search={ai_topic.replace(' ', '+')}"},
-                                {"name": f"Facing History: {ai_topic}", "url": f"https://www.facinghistory.org/search?keys={ai_topic.replace(' ', '+')}&type=All"}
-                            ]
-                            online_courses = [
-                                {"name": f"Coursera: {ai_topic} in History", "url": f"https://www.coursera.org/search?query={ai_topic}%20history&index=prod_all_launched_products_term_optimization"},
-                                {"name": f"edX: Historical Analysis of {ai_topic}", "url": f"https://www.edx.org/search?q={ai_topic}+history"},
-                                {"name": f"FutureLearn: {ai_topic} Courses", "url": f"https://www.futurelearn.com/search?q={ai_topic}+history"}
-                            ]
-                            books_articles = [
-                                {"name": f"JSTOR Articles on {ai_topic}", "url": f"https://www.jstor.org/action/doBasicSearch?Query={ai_topic}+history"},
-                                {"name": f"Google Books on {ai_topic}", "url": f"https://www.google.com/search?tbm=bks&q={ai_topic}+history"},
-                                {"name": f"Internet History Sourcebooks", "url": "https://sourcebooks.fordham.edu/"}
-                            ]
-                            videos_podcasts = [
-                                {"name": f"Crash Course History", "url": f"https://www.youtube.com/c/crashcourse/search?query={ai_topic}+history"},
-                                {"name": f"Dan Carlin's Hardcore History", "url": "https://www.dancarlin.com/hardcore-history-series/"},
-                                {"name": f"BBC History Podcasts", "url": "https://www.bbc.co.uk/sounds/category/factual-history"}
-                            ]
-                            next_topics = [
-                                f"Examining different historical perspectives on {ai_topic}",
-                                f"Investigating the long-term impacts and legacy of {ai_topic}",
-                                f"Connecting {ai_topic} to current events and contemporary issues"
-                            ]
-                        else:
-                            resources = [
-                                {"name": f"TED-Ed: {ai_topic}", "url": f"https://ed.ted.com/search?qs={ai_topic.replace(' ', '+')}"},
-                                {"name": f"PBS Learning Media: {ai_topic}", "url": f"https://www.pbslearningmedia.org/search/?q={ai_topic.replace(' ', '+')}"},
-                                {"name": f"Smithsonian Education: {ai_topic}", "url": f"https://www.si.edu/search/education-resources?edan_q={ai_topic.replace(' ', '+')}"},
-                                {"name": f"OER Commons: {ai_topic}", "url": f"https://www.oercommons.org/search?f.search={ai_topic.replace(' ', '+')}&f.general_subject=arts"}
-                            ]
-                            online_courses = [
-                                {"name": f"Coursera: {ai_topic} Courses", "url": f"https://www.coursera.org/search?query={ai_topic}&index=prod_all_launched_products_term_optimization"},
-                                {"name": f"edX: Learn about {ai_topic}", "url": f"https://www.edx.org/search?q={ai_topic}"},
-                                {"name": f"Udemy: {ai_topic} Classes", "url": f"https://www.udemy.com/courses/search/?src=ukw&q={ai_topic}"}
-                            ]
-                            books_articles = [
-                                {"name": f"Google Scholar: Research on {ai_topic}", "url": f"https://scholar.google.com/scholar?q={ai_topic}"},
-                                {"name": f"Open Textbook Library", "url": "https://open.umn.edu/opentextbooks/"},
-                                {"name": f"JSTOR Articles on {ai_topic}", "url": f"https://www.jstor.org/action/doBasicSearch?Query={ai_topic}"}
-                            ]
-                            videos_podcasts = [
-                                {"name": f"YouTube Educational Videos on {ai_topic}", "url": f"https://www.youtube.com/results?search_query={ai_topic}+education"},
-                                {"name": f"TED Talks on {ai_topic}", "url": f"https://www.ted.com/search?q={ai_topic}"},
-                                {"name": f"Educational Podcasts on {ai_topic}", "url": f"https://player.fm/search/{ai_topic}"}
-                            ]
-                            next_topics = [
-                                f"Deeper exploration of advanced concepts in {ai_topic}",
-                                f"Interdisciplinary connections between {ai_topic} and other subjects",
-                                f"Project-based learning activities centered on {ai_topic}"
-                            ]
-                        
-                        # Display suggested next topics
+                                    {"name": f"PhET Interactive Simulations for {ai_topic}", "url": f"https://phet.colorado.edu/en/simulations/filter?sort=alpha&view=grid&q={ai_topic.replace(' ', '+')}"}
+                                ]
+                            
                         st.write("**Suggested Next Topics:**")
+
                         for topic in next_topics:
                             st.write(f"- {topic}")
                         
@@ -1648,8 +1634,10 @@ By the end of this lesson, students will be able to:
 ### Videos and Podcasts:
 {chr(10).join(f"- {media['name']}: {media['url']}" for media in videos_podcasts)}
 """
+
     
     with tools_tab2:
+
         st.subheader("Assessment Tools")
         
         # Assessment types
@@ -1664,8 +1652,10 @@ By the end of this lesson, students will be able to:
             # Initialize quiz_data in session state if not exists
             if 'quiz_data' not in st.session_state:
                 st.session_state.quiz_data = None
+
             
             with st.form("quiz_generator"):
+
                 quiz_subject = st.text_input("Subject")
                 quiz_topic = st.text_input("Topic")
                 quiz_level = st.select_slider("Difficulty Level", options=["Easy", "Medium", "Hard"])
@@ -1687,7 +1677,9 @@ By the end of this lesson, students will be able to:
                     elif not question_types:
                         st.error("Please select at least one question type.")
                     else:
+
                         with st.spinner("Generating quiz..."):
+
                             # Simulate AI processing
                             time.sleep(2)
                             
@@ -1809,8 +1801,10 @@ By the end of this lesson, students will be able to:
         
         elif assessment_type == "Peer Assessment":
             st.write("### Peer Assessment Setup")
+
             
             with st.form("peer_assessment"):
+
                 assessment_title = st.text_input("Assessment Title")
                 assessment_description = st.text_area("Description")
                 
@@ -1841,8 +1835,10 @@ By the end of this lesson, students will be able to:
         
         elif assessment_type == "Self-Assessment":
             st.write("### Self-Assessment Creator")
+
             
             with st.form("self_assessment"):
+
                 assessment_title = st.text_input("Assessment Title")
                 assessment_description = st.text_area("Description")
                 
@@ -1872,8 +1868,10 @@ By the end of this lesson, students will be able to:
                         st.error("Please add at least one assessment question.")
                     else:
                         st.success(f"Self-assessment '{assessment_title}' created successfully!")
+
     
     with tools_tab3:
+
         st.subheader("Resource Library")
         
         # Get resources from teacher tools
@@ -1893,7 +1891,9 @@ By the end of this lesson, students will be able to:
                 st.write(f"### {category}")
                 
                 for resource in category_resources:
+
                     with st.expander(resource.get('title', 'Unknown Resource')):
+
                         st.write(f"**Description:** {resource.get('description', 'No description available.')}")
                         
                         # Display resource details
@@ -1939,8 +1939,10 @@ By the end of this lesson, students will be able to:
         
         # Upload resource
         st.write("### Share Your Resources")
+
         
         with st.form("resource_upload"):
+
             resource_title = st.text_input("Resource Title")
             resource_description = st.text_area("Description")
             resource_type = st.selectbox("Resource Type", ["Lesson Plan", "Worksheet", "Presentation", "Activity", "Assessment", "Other"])
@@ -1960,8 +1962,10 @@ By the end of this lesson, students will be able to:
                     st.error("Please fill in all required fields.")
                 else:
                     st.success(f"Resource '{resource_title}' shared successfully!")
+
     
     with tools_tab4:
+
         st.subheader("Professional Development")
         
         # Get professional development resources from teacher tools
@@ -1981,7 +1985,9 @@ By the end of this lesson, students will be able to:
                 st.write(f"### {category}")
                 
                 for resource in category_resources:
+
                     with st.expander(resource.get('title', 'Unknown Resource')):
+
                         st.write(f"**Description:** {resource.get('description', 'No description available.')}")
                         
                         # Display resource details
@@ -2050,22 +2056,26 @@ def show_student_dashboard():
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Courses", "Assignments", "Performance Analytics", "Career Planning"])
     
     # Overview tab
+
     with tab1:
+
         st.header("Dashboard Overview")
         
         # Show quick stats
         col1, col2, col3 = st.columns(3)
-        
         with col1:
+
             st.metric("Courses", len(courses))
         
         # Get submissions data
         submissions = get_student_submissions(student_id)
-        
         with col2:
+
             st.metric("Assignments", len(submissions))
+
         
         with col3:
+
             # Calculate completion rate
             completed = sum(1 for s in submissions if s.get('score') is not None)
             completion_rate = (completed / max(1, len(submissions))) * 100
@@ -2105,24 +2115,28 @@ def show_student_dashboard():
         st.subheader("Quick Links")
         
         col1, col2, col3 = st.columns(3)
-        
         with col1:
+
             if st.button("Study Recommendations", use_container_width=True):
                 st.session_state.current_page = 'study_recommendations'
                 st.rerun()
-        
         with col2:
+
             if st.button("Learning Path", use_container_width=True):
                 st.session_state.current_page = 'learning_path'
                 st.rerun()
+
         
         with col3:
+
             if st.button("View My Groups", use_container_width=True):
                 st.session_state.current_page = 'group_management'
                 st.rerun()
     
     # Courses tab
+
     with tab2:
+
         st.header("My Courses")
         if not courses:
             st.info("You haven't enrolled in any courses yet.")
@@ -2130,6 +2144,7 @@ def show_student_dashboard():
             for course in courses:
                 col1, col2 = st.columns([3, 1])
                 with col1:
+
                     st.subheader(f"{course['name']} ({course['code']})")
                     st.write(course['description'])
                     st.write(f"**Period:** {course['start_date']} to {course['end_date']}")
@@ -2142,8 +2157,8 @@ def show_student_dashboard():
                     # Get assignment count
                     assignments = get_course_assignments(course['id'])
                     st.write(f"**Assignments:** {len(assignments)}")
-                
                 with col2:
+
                     if st.button("View Course", key=f"view_course_{course['id']}"):
                         st.session_state.current_course = course
                         st.session_state.current_page = 'course_detail'
@@ -2157,7 +2172,9 @@ def show_student_dashboard():
                 st.divider()
     
     # Assignments tab
+
     with tab3:
+
         st.header("My Assignments")
         if not submissions:
             st.info("You haven't submitted any assignments yet.")
@@ -2187,7 +2204,9 @@ def show_student_dashboard():
                         st.info(f"{assignment.get('title')} - {course_name} - Submitted (awaiting grade) - {submission_date}")
     
     # Performance Analytics tab
+
     with tab4:
+
         st.header("Performance Analytics")
         
         # Get student's overall performance
@@ -2255,7 +2274,9 @@ def show_student_dashboard():
                 st.info("No trends data available.")
     
     # Career Planning tab
+
     with tab5:
+
         st.header("Career Planning")
         
         # Get career data
@@ -2301,7 +2322,9 @@ def show_student_dashboard():
                 
                 # Display resources by type
                 for res_type, type_resources in resource_types.items():
+
                     with st.expander(f"{res_type} ({len(type_resources)})"):
+
                         for resource in type_resources:
                             st.write(f"**{resource.get('title')}**")
                             st.write(resource.get('description', ''))
@@ -2319,6 +2342,198 @@ def show_student_dashboard():
                 st.info("No recommended resources available.")
         else:
             st.info("No career data available.")
+
+
+def get_student_overall_performance(student_id):
+    """Get the overall performance metrics for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    return {
+        'average_score': random.uniform(60, 95),
+        'completed_assignments': random.randint(5, 20),
+        'total_assignments': random.randint(20, 30),
+        'on_time_submissions': random.randint(5, 15),
+        'late_submissions': random.randint(0, 5)
+    }
+
+def generate_skill_graph(student_id):
+    """Generate a skill radar chart for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    skills = ['Programming', 'Math', 'Communication', 'Problem Solving', 'Teamwork']
+    values = [random.uniform(0, 10) for _ in range(len(skills))]
+    
+    # Create radar chart
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, polar=True)
+    
+    # Plot the values
+    angles = np.linspace(0, 2*np.pi, len(skills), endpoint=False).tolist()
+    values += values[:1]  # Close the polygon
+    angles += angles[:1]  # Close the polygon
+    
+    ax.plot(angles, values, 'o-', linewidth=2)
+    ax.fill(angles, values, alpha=0.25)
+    
+    # Set the labels
+    ax.set_thetagrids(np.degrees(angles[:-1]), skills)
+    
+    # Return the figure
+    return fig
+
+def get_skill_summary(student_id):
+    """Get a summary of skills for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    return {
+        'top_skills': ['Programming', 'Problem Solving', 'Critical Thinking'],
+        'skills_to_improve': ['Communication', 'Teamwork'],
+        'recent_improvements': ['Data Analysis', 'Technical Writing']
+    }
+
+def get_skill_gaps(student_id):
+    """Get skill gaps for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    return [
+        {'skill': 'Advanced Mathematics', 'current_level': 6, 'target_level': 8},
+        {'skill': 'Public Speaking', 'current_level': 4, 'target_level': 7},
+        {'skill': 'Data Visualization', 'current_level': 5, 'target_level': 9}
+    ]
+
+def get_skill_development_data(student_id):
+    """Get skill development data over time for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    skills = ['Programming', 'Math', 'Communication']
+    dates = [datetime.now() - timedelta(days=30*i) for i in range(5, 0, -1)]
+    
+    data = []
+    for skill in skills:
+        skill_data = []
+        base_value = random.uniform(3, 6)
+        
+        for i, date in enumerate(dates):
+            # Simulate skill growth over time
+            value = base_value + i * 0.5 + random.uniform(-0.3, 0.3)
+            skill_data.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'value': min(10, value)  # Cap at 10
+            })
+        
+        data.append({
+            'skill': skill,
+            'data': skill_data
+        })
+    
+    return data
+
+def get_trends(student_id):
+    """Get trend data for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    return [
+        {'metric': 'Average Score', 'change': '+5.2%', 'status': 'positive'},
+        {'metric': 'Completion Rate', 'change': '+10.1%', 'status': 'positive'},
+        {'metric': 'On-time Submissions', 'change': '-2.3%', 'status': 'negative'},
+        {'metric': 'Skill Development', 'change': '+7.8%', 'status': 'positive'}
+    ]
+
+def get_career_data(student_id=None):
+    """Get career planning data for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll generate random data
+    return {
+        'current_skill_level': 'Intermediate',
+        'target_skill_level': 'Advanced',
+        'years_to_reach_target': 2.5,
+        'skill_matrix': [
+            {'Skill': 'Programming', 'Current Level': 7, 'Target Level': 9, 'Gap': 2},
+            {'Skill': 'Data Analysis', 'Current Level': 6, 'Target Level': 8, 'Gap': 2},
+            {'Skill': 'Machine Learning', 'Current Level': 4, 'Target Level': 7, 'Gap': 3},
+            {'Skill': 'Communication', 'Current Level': 8, 'Target Level': 9, 'Gap': 1},
+            {'Skill': 'Project Management', 'Current Level': 5, 'Target Level': 7, 'Gap': 2}
+        ],
+        'recommended_courses': [
+            {'Course': 'Advanced Python Programming', 'Provider': 'Coursera', 'Duration': '8 weeks', 'URL': 'https://www.coursera.org/'},
+            {'Course': 'Machine Learning Fundamentals', 'Provider': 'edX', 'Duration': '10 weeks', 'URL': 'https://www.edx.org/'},
+            {'Course': 'Data Science Specialization', 'Provider': 'Udacity', 'Duration': '4 months', 'URL': 'https://www.udacity.com/'}
+        ],
+        'recommended_resources': [
+            {
+                'title': 'Python Data Science Handbook',
+                'type': 'Book',
+                'description': 'Comprehensive guide to data analysis in Python',
+                'url': 'https://jakevdp.github.io/PythonDataScienceHandbook/',
+                'relevant_skills': ['Programming', 'Data Analysis', 'Machine Learning']
+            },
+            {
+                'title': 'Machine Learning Crash Course',
+                'type': 'Online Course',
+                'description': 'Free course by Google covering ML concepts',
+                'url': 'https://developers.google.com/machine-learning/crash-course',
+                'relevant_skills': ['Machine Learning', 'Data Analysis']
+            },
+            {
+                'title': 'Project Management Professional (PMP) Certification',
+                'type': 'Certification',
+                'description': 'Industry-recognized certification for project managers',
+                'url': 'https://www.pmi.org/certifications/project-management-pmp',
+                'relevant_skills': ['Project Management']
+            }
+        ]
+    }
+
+def get_student_language_preference(student_id):
+    """Get language preference for a student."""
+    # This would normally fetch data from a database
+    # For demo purposes, we'll return a default value
+    return 'English'  # Default language
+
+def set_student_language_preference(student_id, language):
+    """Set language preference for a student."""
+    # This would normally update a database
+    # For demo purposes, we'll just return success
+    return True
+
+def translate_feedback(feedback, target_language):
+    """Translate feedback to the target language."""
+    # This would normally use a translation API
+    # For demo purposes, we'll just return the original feedback
+    if target_language == 'English':
+        return feedback
+
+    else:
+        # Simulate translation by adding a prefix
+        return f"[Translated to {target_language}] {feedback}"
+
+def show_course_detail():
+    """Display course detail page."""
+    st.write("Course detail page - Implementation needed")
+
+def show_create_assignment():
+    """Display create assignment page."""
+    st.write("Create assignment page - Implementation needed")
+
+def show_assignment_detail():
+    """Display assignment detail page."""
+    st.write("Assignment detail page - Implementation needed")
+
+def show_submission_detail():
+    """Display submission detail page."""
+    st.write("Submission detail page - Implementation needed")
+
+def show_career_planning():
+    """Display career planning page."""
+    st.write("Career planning page - Implementation needed")
+
+def show_system_settings():
+    """Display system settings page."""
+    st.write("System settings page - Implementation needed")
+
+def show_help_and_support():
+    """Display help and support page."""
+    st.write("Help and support page - Implementation needed")
 
 def show_language_settings():
     """Display language settings for current user."""
@@ -2379,17 +2594,19 @@ def show_language_settings():
         translated_text = translate_feedback(original_text, selected_language['code'])
         
         col1, col2 = st.columns(2)
-        
         with col1:
+
             st.write("**Original Text (English)**")
             st.write(original_text)
-        
         with col2:
+
             st.write(f"**Translated Text ({selected_language['name']})**")
             st.write(translated_text)
     
     # Language information
+
     with st.expander("About Language Support"):
+
         st.write("""
         EduMate provides automatic translation of feedback and important system messages in multiple languages. 
         This helps ensure that all students can access and understand feedback in their preferred language.
@@ -2454,8 +2671,10 @@ def show_teacher_analytics():
         student = get_user_by_id(student_id)
         if student:
             students.append(student)
+
     
     with tab1:
+
         st.header("Class Dashboard")
         
         # Use TeacherAnalyticsService to generate class dashboard
@@ -2473,20 +2692,24 @@ def show_teacher_analytics():
             
             metrics = dashboard_data.get('class_metrics', {})
             col1, col2, col3, col4 = st.columns(4)
-            
                 with col1:
+
                 avg_score = metrics.get('average_score', 0)
                 st.metric("Average Score", f"{avg_score:.1f}%")
-            
                 with col2:
+
                 completion_rate = metrics.get('completion_rate', 0) * 100
                 st.metric("Completion Rate", f"{completion_rate:.1f}%")
+
             
             with col3:
+
                 at_risk_count = metrics.get('at_risk_students', 0)
                 st.metric("At-Risk Students", at_risk_count)
+
             
             with col4:
+
                 on_track_count = metrics.get('on_track_students', 0)
                 st.metric("On-Track Students", on_track_count)
             
@@ -2585,8 +2808,10 @@ def show_teacher_analytics():
                             st.write(f"- {suggestion}")
         else:
             st.warning("Unable to generate class dashboard. Ensure students are enrolled and have submitted assignments.")
+
     
     with tab2:
+
         st.header("Student Comparison")
         
         if not students:
@@ -2732,8 +2957,10 @@ def show_teacher_analytics():
                     st.warning("Unable to generate student comparison. Please ensure selected students have submitted assignments.")
                                                 else:
                 st.info("Please select at least one student to compare.")
+
     
     with tab3:
+
         st.header("Longitudinal Analysis")
         
         # Use TeacherAnalyticsService to generate longitudinal analysis
@@ -2850,22 +3077,24 @@ def show_teacher_analytics():
             # Display most improved and struggling areas
             if 'trends' in longitudinal_data:
                 col1, col2 = st.columns(2)
-                
                 with col1:
+
                     st.subheader("Most Improved Areas")
                     improved_areas = longitudinal_data['trends'].get('improved_areas', [])
                     for area in improved_areas:
                         st.success(f"**{area.get('name', '')}:** {area.get('improvement', 0):.1f}% improvement")
-                
                 with col2:
+
                     st.subheader("Struggling Areas")
                     struggling_areas = longitudinal_data['trends'].get('struggling_areas', [])
                     for area in struggling_areas:
                         st.error(f"**{area.get('name', '')}:** {area.get('decline', 0):.1f}% decline")
         else:
             st.warning("Unable to generate longitudinal analysis. Please ensure sufficient data is available over time.")
+
     
     with tab4:
+
         st.header("AI Insights")
         
         # Use TeacherAnalyticsService to generate AI insights
@@ -2888,7 +3117,9 @@ def show_teacher_analytics():
                     student = next((s for s in students if s['id'] == student_id), {})
                     student_name = student.get('name', f"Student {student_id}")
                     
-                    with st.expander(f"{student_name} - Risk Score: {student_data.get('risk_score', 0):.1f}/10"):
+                    
+                    with st.expander(f"{student_name} - Risk Score:
+ {student_data.get('risk_score', 0):.1f}/10"):
                         st.write("**Risk Factors:**")
                         for factor in student_data.get('risk_factors', []):
                             st.warning(f"- {factor}")
@@ -2966,7 +3197,9 @@ def main():
             show_login_page()
     else:
         # Set up sidebar navigation
+
         with st.sidebar:
+
             st.image("https://i.imgur.com/ZVU5qN6.png", width=100)  # Replace with your logo
             st.title("EduMate")
             
@@ -2990,6 +3223,7 @@ def main():
                 if st.button("Group Management", use_container_width=True):
                     st.session_state.current_page = 'group_management'
                     st.rerun()
+
             else:  # student
                 if st.button("Study Recommendations", use_container_width=True):
                     st.session_state.current_page = 'study_recommendations'
@@ -3220,7 +3454,9 @@ def show_study_recommendations():
                 
                 # Display improvement tips if available
                 if 'tips' in area:
+
                     with st.expander("Improvement Tips"):
+
                         for tip in area['tips']:
                             st.write(f"• {tip}")
                 
@@ -3242,7 +3478,9 @@ def show_study_recommendations():
             
             # Display resources by type
             for res_type, type_resources in resource_types.items():
+
                 with st.expander(f"{res_type} ({len(type_resources)})"):
+
                     for resource in type_resources:
                         st.write(f"**{resource.get('title')}**")
                         st.write(resource.get('description', ''))
@@ -3264,7 +3502,9 @@ def show_study_recommendations():
         activities = recommendations.get('practice_activities', [])
         if activities:
             for activity in activities:
+
                 with st.expander(activity.get('title', 'Practice Activity')):
+
                     st.write(activity.get('description', ''))
                     
                     # Display difficulty level if available
@@ -3559,8 +3799,8 @@ def show_learning_path():
                 
                 # Display skills by status
                 col1, col2 = st.columns(2)
-                
                 with col1:
+
                     st.write("**Mastered Skills**")
                     if status_groups['mastered']:
                         for skill in status_groups['mastered']:
@@ -3574,8 +3814,8 @@ def show_learning_path():
                             st.warning(f"{skill['name']} ({skill['proficiency']*100:.1f}%)")
                 else:
                         st.info("No developing skills yet")
-                
                 with col2:
+
                     st.write("**Proficient Skills**")
                     if status_groups['proficient']:
                         for skill in status_groups['proficient']:
@@ -3642,16 +3882,16 @@ def show_learning_path():
                 
                 for resource in resources:
                     col1, col2 = st.columns([3, 1])
-                    
                     with col1:
+
                         st.write(f"**{resource.get('title')}**")
                         st.write(resource.get('description', ''))
                         
                         # Display related skills
                         if 'related_skills' in resource:
                             st.caption(f"Related skills: {', '.join(resource['related_skills'])}")
-                    
                     with col2:
+
                         if 'url' in resource:
                             st.link_button("Open Resource", resource['url'])
                     
@@ -3755,8 +3995,10 @@ def show_group_management():
     
     # Create tabs for different actions
     tab1, tab2, tab3 = st.tabs(["Create Groups", "View Groups", "Group Analysis"])
+
     
     with tab1:
+
         st.subheader("Create New Groups")
         
         # Group size input
@@ -3815,8 +4057,10 @@ def show_group_management():
         if students:
             col1, col2 = st.columns(2)
             with col1:
+
                 student1 = st.selectbox("Student 1", options=students, format_func=lambda x: x['name'])
             with col2:
+
                 # Filter out the first student
                 remaining_students = [s for s in students if s['id'] != student1['id']]
                 student2 = st.selectbox("Student 2", options=remaining_students, format_func=lambda x: x['name'])
@@ -3875,7 +4119,9 @@ def show_group_management():
             if not criteria:
                 st.error("Please select at least one grouping criterion.")
             else:
+
                 with st.spinner("Creating optimal student groups..."):
+
                     # Prepare student data for the group formation service
                     student_data = []
                     for student in students:
@@ -3903,7 +4149,9 @@ def show_group_management():
                         
                         # Display the groups
                         for i, group in enumerate(groups, 1):
+
                             with st.expander(f"Group {i} ({len(group['members'])} students)"):
+
                                 # Display group members
                                 for member in group['members']:
                                     st.write(f"• {member['name']}")
@@ -3916,8 +4164,10 @@ def show_group_management():
                                     
                                     col1, col2 = st.columns(2)
                                     with col1:
+
                                         st.metric("Avg. Performance", f"{metrics.get('avg_performance', 0):.1f}%")
                                     with col2:
+
                                         st.metric("Skill Diversity", f"{metrics.get('skill_diversity', 0):.1f}/10")
                         
                         # Save the group assignment
@@ -3930,8 +4180,10 @@ def show_group_management():
                         }
                     else:
                         st.error("Failed to create groups. Please try different parameters.")
+
     
     with tab2:
+
         st.subheader("View Existing Groups")
         
         # Get group assignments for this course
@@ -3954,7 +4206,9 @@ def show_group_management():
                 # Display groups
                 groups = selected_assignment.get('groups', [])
                 for i, group in enumerate(groups, 1):
+
                     with st.expander(f"Group {i} ({len(group.get('members', []))} students)"):
+
                         # Display group members
                         for member in group.get('members', []):
                             st.write(f"• {member.get('name', 'Unknown')}")
@@ -3970,8 +4224,10 @@ def show_group_management():
                             st.divider()
                             st.write("**Group Performance:**")
                             st.metric("Performance Score", f"{group['performance']:.1f}/10")
+
     
     with tab3:
+
         st.subheader("Group Effectiveness Analysis")
         
         # Get group assignments for this course
@@ -4024,7 +4280,8 @@ def show_group_management():
                 best_algorithm = algorithm_performance.get('best_algorithm', '')
                 best_score = algorithm_performance.get('best_score', 0)
                 
-                st.success(f"Based on the analysis, the **{best_algorithm}** algorithm has performed best with an average score of **{best_score:.1f}/10**.")
+                st.success(f"Based on the analysis, the **{best_algorithm}** algorithm has performed best
+ with an average score of **{best_score:.1f}/10**.")
 
 def show_student_groups():
     """Display group assignments for a student."""
@@ -4036,7 +4293,9 @@ def show_student_groups():
         student_id = st.session_state.current_user['id']
         
         # Get student's group assignments using the service
+
         with st.spinner("Loading your groups..."):
+
             group_assignments = group_formation_service.get_student_groups(student_id=student_id)
         
         if not group_assignments:
@@ -4059,7 +4318,9 @@ def show_student_groups():
                         break
                 
                 if student_group:
+
                     with st.expander(f"{course_name} - Group {group_number}"):
+
                         # Display creation date
                         created_at = assignment.get('created_at', '')
                         if created_at:
