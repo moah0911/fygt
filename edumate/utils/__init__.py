@@ -1,4 +1,6 @@
-"""Utility functions for EduMate."""
+"""
+Utility modules for the Edumate platform
+"""
 # Import utilities to make them available when importing the package
 from edumate.utils.file_utils import allowed_file, save_file
 from edumate.utils.text_utils import extract_text_from_file, similarity_score
