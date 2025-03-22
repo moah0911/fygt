@@ -9,7 +9,7 @@ from pathlib import Path
 
 import google.generativeai as genai
 try:
-import openai
+    import openai
 except ImportError:
     openai = None
 
@@ -39,7 +39,7 @@ class GeminiService:
         # Configure Gemini
         if self.api_key:
             try:
-            genai.configure(api_key=self.api_key)
+                genai.configure(api_key=self.api_key)
                 self.model = genai.GenerativeModel('gemini-1.5-pro')
                 self.vision_model = genai.GenerativeModel('gemini-1.5-flash')
                 logger.info("Gemini API initialized successfully")
@@ -81,24 +81,24 @@ class GeminiService:
         # Try Gemini first
         if not self.use_fallback and self.api_key:
             for attempt in range(retries):
-            try:
-                # Use Gemini
+                try:
+                    # Use Gemini
                     response = self.model.generate_content(
-                    prompt,
-                    generation_config=genai.types.GenerationConfig(
-                        temperature=temperature,
-                        max_output_tokens=max_tokens
+                        prompt,
+                        generation_config=genai.types.GenerationConfig(
+                            temperature=temperature,
+                            max_output_tokens=max_tokens
+                        )
                     )
-                )
                     result = response.text
                     self._cache_result(cache_key, result)
                     return result
-            except Exception as e:
+                except Exception as e:
                     logger.error(f"Error using Gemini API (attempt {attempt+1}/{retries}): {e}")
                     if attempt == retries - 1 and self.openai_api_key:
-                    self.use_fallback = True
+                        self.use_fallback = True
                         logger.info("Falling back to OpenAI.")
-                else:
+                    else:
                         time.sleep(1)  # Slight delay before retry
         
         # Use OpenAI as fallback
