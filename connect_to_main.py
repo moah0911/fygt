@@ -91,6 +91,11 @@ def main():
         new_code = [
             "def show_test_creator():\n",
             "    \"\"\"Display the test creation interface for teachers.\"\"\"\n",
+            "    # Import required modules\n",
+            "    import streamlit as st\n",
+            "    import sys\n",
+            "    import os\n",
+            "    \n",
             "    # Import the modular test creator component\n",
             "    try:\n",
             "        from edumate.pages.test_creator import show_test_creator as modular_test_creator\n",
