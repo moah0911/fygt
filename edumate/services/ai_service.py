@@ -93,6 +93,12 @@ class AIService:
         return models
     
     @classmethod
+    def get_response(cls, prompt: str, system_message: str = "", model: Optional[str] = None) -> str:
+        """Get a response from the AI for use in the AI tutor interface."""
+        combined_prompt = f"{system_message}\n\n{prompt}" if system_message else prompt
+        return cls.generate_text(combined_prompt, model)
+    
+    @classmethod
     def generate_text(cls, 
                      prompt: str, 
                      model: Optional[str] = None,

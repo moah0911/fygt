@@ -89,10 +89,8 @@ def show_student_progress():
 
 def show_ai_tutor():
     """Display the AI tutor page"""
-    st.header("AI Tutor")
-    st.write("Interactive AI-powered tutoring sessions.")
-    
-    st.info("AI tutoring feature is under development.")
+    from edumate.pages.ai_tutor import show_ai_tutor_page
+    show_ai_tutor_page()
 
 def show_resources():
     """Display the resources page"""
